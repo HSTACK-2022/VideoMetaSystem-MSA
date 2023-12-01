@@ -1,10 +1,10 @@
-package org.hstack.vmeta.search;
+package org.hstack.vmeta.videoMetadata;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SearchApplicationTests {
+class VideoMetadataApplicationTests {
 
 	@Test
 	void contextLoads() {
