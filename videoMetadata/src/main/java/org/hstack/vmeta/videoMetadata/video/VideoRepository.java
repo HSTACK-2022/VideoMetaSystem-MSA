@@ -15,6 +15,8 @@ public interface VideoRepository extends JpaRepository<Video, Long> {
 
     List<Video> findByTitleContains(String title);
 
-    void delete(Video video);
+    void deleteById(Long id);
+
+    void deleteAll();
 
 }

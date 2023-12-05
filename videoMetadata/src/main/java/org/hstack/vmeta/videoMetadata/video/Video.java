@@ -4,15 +4,16 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
-@Setter
 @Builder
 @Entity
 @Table(name="video")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Video {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
     @Column
     private String title;
@@ -22,4 +23,7 @@ public class Video {
 
     @Column
     private String uploaderName;
+
+    @Column
+    private String thumbnailPath;
 }

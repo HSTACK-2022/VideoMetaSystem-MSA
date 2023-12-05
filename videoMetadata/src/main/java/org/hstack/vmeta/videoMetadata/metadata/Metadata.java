@@ -18,14 +18,15 @@ import java.util.List;
 
 @Builder
 @Getter
-@Setter
 @Entity
 @Table(name="metadata")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Metadata {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
     @Column
     private String title;

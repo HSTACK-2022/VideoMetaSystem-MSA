@@ -1,5 +1,6 @@
 package org.hstack.vmeta.videoMetadata.metadata.category;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,9 +8,9 @@ import lombok.Setter;
 import java.util.HashMap;
 import java.util.Map;
 
-@Getter
-@Setter
+
 @Builder
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class Category {
 
     private CategoryType categoryType;

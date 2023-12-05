@@ -1,13 +1,11 @@
 package org.hstack.vmeta.videoMetadata.video;
 
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,21 +14,20 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 
 @DataJpaTest
-@ExtendWith(SpringExtension.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class VideoRepositoryTest {
 
     @Autowired
     private VideoRepository videoRepository;
 
-    @AfterEach
+    @BeforeEach
     void 초기화() {
         videoRepository.deleteAll();
     }
 
     @Test
     @Transactional
-    void 비디오저장() {
+    void 비디오_저장() {
         // given
         Video video = Video.builder()
                 .title("testVideo")
@@ -48,7 +45,7 @@ class VideoRepositoryTest {
 
     @Test
     @Transactional
-    void 비디오전체선택() {
+    void 비디오_전체검색() {
         // given
         Video video1 = Video.builder()
                 .title("testVideo1")
@@ -74,7 +71,7 @@ class VideoRepositoryTest {
 
     @Test
     @Transactional
-    void 비디오삭제() {
+    void 비디오_삭제() {
         // given
         Video video = Video.builder()
                 .title("testVideo")
@@ -84,7 +81,7 @@ class VideoRepositoryTest {
 
         // when
         videoRepository.save(video);
-        videoRepository.delete(video);
+        videoRepository.deleteById(video.getId());
 
         // then
         Optional<Video> result = videoRepository.findById(video.getId());
