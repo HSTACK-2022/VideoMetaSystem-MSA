@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import org.hstack.vmeta.videoMetadata.metadata.category.*;
 import org.hstack.vmeta.videoMetadata.metadata.script.*;
 import org.hstack.vmeta.videoMetadata.metadata.keyword.*;
-import org.hstack.vmeta.videoMetadata.metadata.index.*;
+import org.hstack.vmeta.videoMetadata.metadata.indexScript.*;
 import org.hstack.vmeta.videoMetadata.metadata.narrative.*;
 import org.hstack.vmeta.videoMetadata.metadata.presentation.*;
 import org.hstack.vmeta.videoMetadata.metadata.videoFrame.*;
@@ -18,7 +18,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import java.sql.Date;
 import java.sql.Time;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -51,9 +50,9 @@ class MetadataRepositoryTest {
                 .videoFrame(VideoFrame.FPS24)
                 .category(List.of(
                         Category.builder()
-                        .categoryType(CategoryType.IT)
-                        .perc(1.0F)
-                        .build()))
+                                .categoryType(CategoryType.IT)
+                                .perc(1.0F)
+                                .build()))
                 .script(List.of(
                         Script.builder()
                                 .time(new Time(0, 0, 0))
@@ -66,8 +65,8 @@ class MetadataRepositoryTest {
                                 .expose(true)
                                 .autocreated(true)
                                 .build()))
-                .index(List.of(
-                        Index.builder()
+                .indexScript(List.of(
+                        IndexScript.builder()
                                 .time(new Time(0, 0, 0))
                                 .content("test index")
                                 .expose(true)
@@ -116,8 +115,8 @@ class MetadataRepositoryTest {
                                     .expose(true)
                                     .autocreated(true)
                                     .build()))
-                    .index(List.of(
-                            Index.builder()
+                    .indexScript(List.of(
+                            IndexScript.builder()
                                     .time(new Time(0, 0, 0))
                                     .content("test index")
                                     .expose(true)
@@ -135,9 +134,6 @@ class MetadataRepositoryTest {
         assertThat(resMDList.size()).isEqualTo(5);
     }
 
-
-    /*
-
     @Test
     @Transactional
     void 메타데이터_제목검색() {
@@ -145,16 +141,28 @@ class MetadataRepositoryTest {
         Metadata metadata1 = Metadata.builder()
                 .id(1L)
                 .title("1test title")
+                .narrative(Narrative.APPLICATION)
+                .presentation(Presentation.DYNAMIC)
+                .videoFrame(VideoFrame.FPS24)
+                .videoType(VideoType.MP4)
                 .build();
 
         Metadata metadata2 = Metadata.builder()
                 .id(2L)
                 .title("test title2")
+                .narrative(Narrative.APPLICATION)
+                .presentation(Presentation.DYNAMIC)
+                .videoFrame(VideoFrame.FPS24)
+                .videoType(VideoType.MP4)
                 .build();
 
         Metadata metadata3 = Metadata.builder()
                 .id(3L)
                 .title("none")
+                .narrative(Narrative.APPLICATION)
+                .presentation(Presentation.DYNAMIC)
+                .videoFrame(VideoFrame.FPS24)
+                .videoType(VideoType.MP4)
                 .build();
 
         metadataRepository.save(metadata1);
@@ -162,7 +170,7 @@ class MetadataRepositoryTest {
         metadataRepository.save(metadata3);
 
         // when
-        List<Metadata> resMDList = metadataRepository.findByTitleContains("test");
+        List<MetadataMapping> resMDList = metadataRepository.findByTitleContains("test");
 
         // then
         assertThat(resMDList.size()).isEqualTo(2);
@@ -174,6 +182,10 @@ class MetadataRepositoryTest {
         // given
         Metadata metadata1 = Metadata.builder()
                 .id(1L)
+                .narrative(Narrative.APPLICATION)
+                .presentation(Presentation.DYNAMIC)
+                .videoFrame(VideoFrame.FPS24)
+                .videoType(VideoType.MP4)
                 .keyword(List.of(
                         Keyword.builder().keyword("test1").perc(0.5F).expose(true).autocreated(true).build(),
                         Keyword.builder().keyword("aaaa").perc(0.5F).expose(true).autocreated(true).build()))
@@ -181,6 +193,10 @@ class MetadataRepositoryTest {
 
         Metadata metadata2 = Metadata.builder()
                 .id(2L)
+                .narrative(Narrative.APPLICATION)
+                .presentation(Presentation.DYNAMIC)
+                .videoFrame(VideoFrame.FPS24)
+                .videoType(VideoType.MP4)
                 .keyword(List.of(
                         Keyword.builder().keyword("2test").perc(0.5F).expose(true).autocreated(true).build(),
                         Keyword.builder().keyword("bbbb").perc(0.5F).expose(true).autocreated(true).build()))
@@ -188,6 +204,10 @@ class MetadataRepositoryTest {
 
         Metadata metadata3 = Metadata.builder()
                 .id(3L)
+                .narrative(Narrative.APPLICATION)
+                .presentation(Presentation.DYNAMIC)
+                .videoFrame(VideoFrame.FPS24)
+                .videoType(VideoType.MP4)
                 .keyword(List.of(
                         Keyword.builder().keyword("none").perc(0.5F).expose(true).autocreated(true).build(),
                         Keyword.builder().keyword("cccc").perc(0.5F).expose(true).autocreated(true).build()))
@@ -198,18 +218,23 @@ class MetadataRepositoryTest {
         metadataRepository.save(metadata3);
 
         // when
-        List<Metadata> resMDList = metadataRepository.findByKeywordContains("test");
+        List<MetadataMapping> resMDList = metadataRepository.findByKeywordContains("test");
 
         // then
         assertThat(resMDList.size()).isEqualTo(2);
     }
 
+    /*
     @Test
     @Transactional
     void 메타데이터_카테고리검색() {
         // given
         Metadata metadata1 = Metadata.builder()
                 .id(1L)
+                .narrative(Narrative.APPLICATION)
+                .presentation(Presentation.DYNAMIC)
+                .videoFrame(VideoFrame.FPS24)
+                .videoType(VideoType.MP4)
                 .category(List.of(
                         Category.builder().categoryType(CategoryType.IT).perc(0.5F).build(),
                         Category.builder().categoryType(CategoryType.ART).perc(0.5F).build()))
@@ -217,6 +242,10 @@ class MetadataRepositoryTest {
 
         Metadata metadata2 = Metadata.builder()
                 .id(2L)
+                .narrative(Narrative.APPLICATION)
+                .presentation(Presentation.DYNAMIC)
+                .videoFrame(VideoFrame.FPS24)
+                .videoType(VideoType.MP4)
                 .category(List.of(
                         Category.builder().categoryType(CategoryType.IT).perc(0.5F).build(),
                         Category.builder().categoryType(CategoryType.LAW).perc(0.5F).build()))
@@ -224,6 +253,10 @@ class MetadataRepositoryTest {
 
         Metadata metadata3 = Metadata.builder()
                 .id(3L)
+                .narrative(Narrative.APPLICATION)
+                .presentation(Presentation.DYNAMIC)
+                .videoFrame(VideoFrame.FPS24)
+                .videoType(VideoType.MP4)
                 .category(List.of(
                         Category.builder().categoryType(CategoryType.FOOD).perc(0.5F).build(),
                         Category.builder().categoryType(CategoryType.MEDIA).perc(0.5F).build()))
@@ -234,11 +267,13 @@ class MetadataRepositoryTest {
         metadataRepository.save(metadata3);
 
         // when
-        List<Metadata> resMDList = metadataRepository.findByCategoryContains("test");
+        List<MetadataMapping> resMDList = metadataRepository.findByCategoryContains(CategoryType.IT);
 
         // then
         assertThat(resMDList.size()).isEqualTo(2);
     }
+
+    */
 
     @Test
     @Transactional
@@ -247,16 +282,28 @@ class MetadataRepositoryTest {
         Metadata metadata1 = Metadata.builder()
                 .id(1L)
                 .uploaderName("test")
+                .narrative(Narrative.APPLICATION)
+                .presentation(Presentation.DYNAMIC)
+                .videoFrame(VideoFrame.FPS24)
+                .videoType(VideoType.MP4)
                 .build();
 
         Metadata metadata2 = Metadata.builder()
                 .id(2L)
                 .uploaderName("2test2")
+                .narrative(Narrative.APPLICATION)
+                .presentation(Presentation.DYNAMIC)
+                .videoFrame(VideoFrame.FPS24)
+                .videoType(VideoType.MP4)
                 .build();
 
         Metadata metadata3 = Metadata.builder()
                 .id(3L)
                 .uploaderName("none")
+                .narrative(Narrative.APPLICATION)
+                .presentation(Presentation.DYNAMIC)
+                .videoFrame(VideoFrame.FPS24)
+                .videoType(VideoType.MP4)
                 .build();
 
         metadataRepository.save(metadata1);
@@ -264,13 +311,11 @@ class MetadataRepositoryTest {
         metadataRepository.save(metadata3);
 
         // when
-        List<Metadata> resMDList = metadataRepository.findByUploaderNameContains("test");
+        List<MetadataMapping> resMDList = metadataRepository.findByUploaderNameContains("test");
 
         // then
         assertThat(resMDList.size()).isEqualTo(2);
     }
-
-     */
 
     @Test
     @Transactional
@@ -304,8 +349,8 @@ class MetadataRepositoryTest {
                                 .expose(true)
                                 .autocreated(true)
                                 .build()))
-                .index(List.of(
-                        Index.builder()
+                .indexScript(List.of(
+                        IndexScript.builder()
                                 .time(new Time(0, 0, 0))
                                 .content("test index")
                                 .expose(true)

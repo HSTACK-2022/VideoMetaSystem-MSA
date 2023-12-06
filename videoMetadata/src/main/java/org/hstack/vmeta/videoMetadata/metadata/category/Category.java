@@ -1,19 +1,28 @@
 package org.hstack.vmeta.videoMetadata.metadata.category;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
-
 @Builder
+@Entity
+@Table(name="category")
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class Category {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column
     private CategoryType categoryType;
+
+    @Column
     private float perc;
 
     @Override

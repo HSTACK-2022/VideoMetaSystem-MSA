@@ -1,10 +1,11 @@
 package org.hstack.vmeta.videoMetadata.metadata;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 
 import org.hstack.vmeta.videoMetadata.metadata.category.*;
-import org.hstack.vmeta.videoMetadata.metadata.index.Index;
+import org.hstack.vmeta.videoMetadata.metadata.indexScript.IndexScript;
 import org.hstack.vmeta.videoMetadata.metadata.keyword.*;
 import org.hstack.vmeta.videoMetadata.metadata.narrative.*;
 import org.hstack.vmeta.videoMetadata.metadata.presentation.*;
@@ -16,8 +17,9 @@ import java.sql.Date;
 import java.sql.Time;
 import java.util.List;
 
-@Builder
+
 @Getter
+@Builder
 @Entity
 @Table(name="metadata")
 @NoArgsConstructor
@@ -25,7 +27,6 @@ import java.util.List;
 public class Metadata {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column
@@ -59,19 +60,19 @@ public class Metadata {
     @Convert(converter = VideoFrameAttributeConverter.class)
     private VideoFrame videoFrame;
 
-    @Column
-    @Convert(converter = CategoryAttributeConverter.class)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name= "metadata_id")
     private List<Category> category;
 
-    @ElementCollection
-    @CollectionTable(joinColumns = @JoinColumn(name= "metadata_id", referencedColumnName = "id"))
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name= "metadata_id")
     private List<Script> script;
 
-    @ElementCollection
-    @CollectionTable(joinColumns = @JoinColumn(name= "metadata_id", referencedColumnName = "id"))
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name= "metadata_id")
     private List<Keyword> keyword;
 
-    @ElementCollection
-    @CollectionTable(joinColumns = @JoinColumn(name= "metadata_id", referencedColumnName = "id"))
-    private List<Index> index;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name= "metadata_id")
+    private List<IndexScript> indexScript;
 }
