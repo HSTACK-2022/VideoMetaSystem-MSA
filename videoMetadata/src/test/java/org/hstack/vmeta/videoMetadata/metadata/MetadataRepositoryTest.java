@@ -18,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import java.sql.Date;
 import java.sql.Time;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -170,7 +171,7 @@ class MetadataRepositoryTest {
         metadataRepository.save(metadata3);
 
         // when
-        List<MetadataMapping> resMDList = metadataRepository.findByTitleContains("test");
+        Set<MetadataMapping> resMDList = metadataRepository.findByTitleContains("test");
 
         // then
         assertThat(resMDList.size()).isEqualTo(2);
@@ -218,13 +219,12 @@ class MetadataRepositoryTest {
         metadataRepository.save(metadata3);
 
         // when
-        List<MetadataMapping> resMDList = metadataRepository.findByKeywordContains("test");
+        Set<MetadataMapping> resMDList = metadataRepository.findByKeywordContains("test");
 
         // then
         assertThat(resMDList.size()).isEqualTo(2);
     }
 
-    /*
     @Test
     @Transactional
     void 메타데이터_카테고리검색() {
@@ -267,13 +267,11 @@ class MetadataRepositoryTest {
         metadataRepository.save(metadata3);
 
         // when
-        List<MetadataMapping> resMDList = metadataRepository.findByCategoryContains(CategoryType.IT);
+        Set<MetadataMapping> resMDList = metadataRepository.findByCategory(CategoryType.IT);
 
         // then
         assertThat(resMDList.size()).isEqualTo(2);
     }
-
-    */
 
     @Test
     @Transactional
@@ -311,7 +309,7 @@ class MetadataRepositoryTest {
         metadataRepository.save(metadata3);
 
         // when
-        List<MetadataMapping> resMDList = metadataRepository.findByUploaderNameContains("test");
+        Set<MetadataMapping> resMDList = metadataRepository.findByUploaderNameContains("test");
 
         // then
         assertThat(resMDList.size()).isEqualTo(2);
