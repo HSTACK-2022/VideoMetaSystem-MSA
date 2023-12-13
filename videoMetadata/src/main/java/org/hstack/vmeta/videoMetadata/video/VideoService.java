@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -12,10 +11,6 @@ public class VideoService {
 
     @Autowired
     private VideoRepository videoRepository;
-
-    public VideoService(VideoRepository videoRepository) {
-        this.videoRepository = videoRepository;
-    }
 
     /*
      * VideoRepository에서 모든 Video를 받아
@@ -32,7 +27,7 @@ public class VideoService {
      * videoDTO를 video로 변환 후 저장한다.
      */
     public Long save(VideoDTO videoDTO) {
-        return videoRepository.save(videoDTO.videoDTO2Video());
+        return videoRepository.save(videoDTO.videoDTO2Video()).getId();
     }
 
     /*

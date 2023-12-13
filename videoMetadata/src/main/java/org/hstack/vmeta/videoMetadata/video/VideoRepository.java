@@ -9,7 +9,7 @@ import java.util.Optional;
 @Repository
 public interface VideoRepository extends JpaRepository<Video, Long> {
 
-    Long save(Video video);
+    Video save(Video video);
 
     Optional<Video> findById(Long id);
 
