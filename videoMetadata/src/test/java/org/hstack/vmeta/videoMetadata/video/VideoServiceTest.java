@@ -77,7 +77,7 @@ class VideoServiceTest {
         videoService.save(videoDTO);
 
         // when
-        videoService.delete(videoDTO);
+        videoService.delete(videoDTO.getId());
 
         // then
         assertThat(videoRepository.findById(videoDTO.getId())).isEmpty();

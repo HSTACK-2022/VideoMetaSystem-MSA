@@ -33,7 +33,7 @@ public class VideoService {
     /*
      * videoDTO의 id를 기준으로 삭제한다.
      */
-    public void delete(VideoDTO videoDTO) {
-        videoRepository.deleteById(videoDTO.getId());
+    public void delete(Long videoId) {
+        videoRepository.deleteById(videoId);
     }
 }
