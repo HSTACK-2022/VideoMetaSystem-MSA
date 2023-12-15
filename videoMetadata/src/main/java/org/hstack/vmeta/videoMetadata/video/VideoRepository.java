@@ -13,7 +13,7 @@ public interface VideoRepository extends JpaRepository<Video, Long> {
 
     Optional<Video> findById(Long id);
 
-    List<Video> findByTitleContains(String title);
+    Optional<Video> findByTitleContains(String title);
 
     void deleteById(Long id);
 
