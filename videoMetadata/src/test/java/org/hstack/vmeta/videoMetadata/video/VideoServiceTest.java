@@ -1,24 +1,30 @@
 package org.hstack.vmeta.videoMetadata.video;
 
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class VideoServiceTest {
 
-    @Autowired
+    @Mock
     private VideoRepository videoRepository;
 
-    @Autowired
+    @InjectMocks
     private VideoService videoService;
 
 
@@ -28,58 +34,62 @@ class VideoServiceTest {
     }
 
     @Test
+    @DisplayName("전체 비디오 조회")
     void getAll() {
         // given
-        VideoDTO videoDTO1 = VideoDTO.builder()
-                .title("testTitle1")
-                .uploaderName("testUploader1")
-                .build();
+        List<Video> videoList = new ArrayList<>();
+        videoList.add(Video.builder().title("testTitle1").build());
+        videoList.add(Video.builder().title("testTitle2").build());
+        videoList.add(Video.builder().title("testTitle3").build());
 
-        VideoDTO videoDTO2 = VideoDTO.builder()
-                .title("testTitle2")
-                .uploaderName("testUploader2")
-                .build();
+        List<Video> savedList = videoList;
 
-        videoService.save(videoDTO1);
-        videoService.save(videoDTO2);
+        // mocking
+        given(videoRepository.findAll()).willReturn(savedList);
 
         // when
         List<VideoDTO> resList = videoService.getAll();
 
         // then
-        assertThat(resList.size()).isEqualTo(2);
+        assertThat(resList.size()).isEqualTo(videoList.size());
+        for (int i = 0; i < resList.size(); i++) {
+            Video video = videoList.get(i);
+            VideoDTO resVideoDTO = resList.get(i);
+            assertThat(resVideoDTO.getTitle()).isEqualTo(video.getTitle());
+        }
     }
 
     @Test
+    @DisplayName("비디오 저장")
+    @Transactional
     void save() {
         // given
-        VideoDTO videoDTO = VideoDTO.builder()
-                .title("testTitle")
-                .uploaderName("testUploader")
-                .build();
+        VideoDTO videoDTO = VideoDTO.builder().title("testTitle").build();
+        Video saveVideo = videoDTO.videoDTO2Video();
+
+        // mocking
+        given(videoRepository.save(any())).willReturn(videoDTO.videoDTO2Video());
 
         // when
         Long newId = videoService.save(videoDTO);
 
         // then
-        assertThat(newId).isNotNull();
+        assertThat(newId).isEqualTo(saveVideo.getId());
     }
 
     @Test
+    @DisplayName("비디오 삭제")
+    @Transactional
     void delete() {
         // given
-        VideoDTO videoDTO = VideoDTO.builder()
-                .id(1L)
-                .title("testTitle")
-                .uploaderName("testUploader")
-                .build();
+        Long videoId = 1L;
 
-        videoService.save(videoDTO);
+        // mocking
 
         // when
-        videoService.delete(videoDTO.getId());
+        videoService.delete(videoId);
 
         // then
-        assertThat(videoRepository.findById(videoDTO.getId())).isEmpty();
+        verify(videoRepository).deleteById(videoId);
     }
 }

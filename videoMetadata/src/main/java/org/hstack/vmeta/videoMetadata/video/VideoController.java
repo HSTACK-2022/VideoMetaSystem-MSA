@@ -27,7 +27,8 @@ public class VideoController {
     public ResponseEntity<?> saveVideo(@RequestBody VideoDTO videoDTO) {
         try {
             Long videoId = videoService.save(videoDTO);
-            return ResponseEntity.ok("save video # ${videoId} - ${videoDTO.title} succeed.");
+            String body = "save video #" + videoId + " succeed.";
+            return ResponseEntity.ok(body);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
@@ -37,7 +38,8 @@ public class VideoController {
     public ResponseEntity<?> deleteVideo(@RequestParam Long videoId) {
         try {
             videoService.delete(videoId);
-            return ResponseEntity.ok("delete video ${videoId} succeed.");
+            String body = "delete video #" + videoId + " succeed.";
+            return ResponseEntity.ok(body);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
