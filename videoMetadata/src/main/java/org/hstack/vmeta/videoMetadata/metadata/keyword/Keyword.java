@@ -15,8 +15,19 @@ public class Keyword {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column
     private String keyword;
+
+    @Column
     private float perc;
+
+    @Column
     private boolean expose;
+
+    @Column
     private boolean autocreated;
+
+    @Column(name="metadata_id")
+    private Long mid;
 }

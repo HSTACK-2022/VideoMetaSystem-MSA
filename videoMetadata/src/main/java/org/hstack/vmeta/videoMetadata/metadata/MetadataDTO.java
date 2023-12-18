@@ -59,4 +59,42 @@ public class MetadataDTO {
     private List<Keyword> keyword;
 
     private List<IndexScript> indexScript;
+
+    public static MetadataDTO toMetadataDTO(Metadata metadata) {
+        return MetadataDTO.builder()
+                .id(metadata.getId())
+                .title(metadata.getTitle())
+                .uploaderName(metadata.getUploaderName())
+                .narrative(metadata.getNarrative())
+                .presentation(metadata.getPresentation())
+                .length(metadata.getLength())
+                .uploadDate(metadata.getUploadDate())
+                .videoSize(metadata.getVideoSize())
+                .videoType(metadata.getVideoType())
+                .videoFrame(metadata.getVideoFrame())
+                .category(metadata.getCategory())
+                .script(metadata.getScript())
+                .keyword(metadata.getKeyword())
+                .indexScript(metadata.getIndexScript())
+                .build();
+    }
+
+    public Metadata toMetadata() {
+        return Metadata.builder()
+                .id(this.id)
+                .title(this.title)
+                .uploaderName(this.uploaderName)
+                .narrative(this.narrative)
+                .presentation(this.presentation)
+                .length(this.length)
+                .uploadDate(this.uploadDate)
+                .videoSize(this.videoSize)
+                .videoType(this.videoType)
+                .videoFrame(this.videoFrame)
+                .category(this.category)
+                .script(this.script)
+                .keyword(this.keyword)
+                .indexScript(this.indexScript)
+                .build();
+    }
 }

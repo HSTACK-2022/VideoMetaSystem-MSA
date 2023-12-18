@@ -65,10 +65,10 @@ class VideoServiceTest {
     void save() {
         // given
         VideoDTO videoDTO = VideoDTO.builder().title("testTitle").build();
-        Video saveVideo = videoDTO.videoDTO2Video();
+        Video saveVideo = videoDTO.toVideo();
 
         // mocking
-        given(videoRepository.save(any())).willReturn(videoDTO.videoDTO2Video());
+        given(videoRepository.save(any())).willReturn(videoDTO.toVideo());
 
         // when
         Long newId = videoService.save(videoDTO);

@@ -21,7 +21,7 @@ public class VideoDTO {
 
     private String thumbnailPath;
 
-    public static VideoDTO video2VideoDTO(Video video) {
+    public static VideoDTO toVideoDTO(Video video) {
         return VideoDTO.builder()
                 .id(video.getId())
                 .title(video.getTitle())
@@ -30,7 +30,7 @@ public class VideoDTO {
                 .build();
     }
 
-    public Video videoDTO2Video() {
+    public Video toVideo() {
         return Video.builder()
                 .title(this.title)
                 .uploaderName(this.uploaderName)

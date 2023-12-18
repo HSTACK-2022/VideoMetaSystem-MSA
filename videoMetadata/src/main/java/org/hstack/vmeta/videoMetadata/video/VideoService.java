@@ -19,7 +19,7 @@ public class VideoService {
     public List<VideoDTO> getAll() {
         return videoRepository.findAll()
                 .stream()
-                .map(v -> VideoDTO.video2VideoDTO(v))
+                .map(v -> VideoDTO.toVideoDTO(v))
                 .collect(Collectors.toList());
     }
 
@@ -27,7 +27,7 @@ public class VideoService {
      * videoDTO를 video로 변환 후 저장한다.
      */
     public Long save(VideoDTO videoDTO) {
-        return videoRepository.save(videoDTO.videoDTO2Video()).getId();
+        return videoRepository.save(videoDTO.toVideo()).getId();
     }
 
     /*
