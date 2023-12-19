@@ -1,5 +1,6 @@
 package org.hstack.vmeta.videoMetadata.video;
 
+import org.hstack.vmeta.videoMetadata.metadata.MetadataDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,17 @@ public class VideoService {
      */
     public List<VideoDTO> getAll() {
         return videoRepository.findAll()
+                .stream()
+                .map(v -> VideoDTO.toVideoDTO(v))
+                .collect(Collectors.toList());
+    }
+
+    /*
+     * 특정 id list에 해당하는 Video를 가져온다.
+     * videoMetadata에서 써먹기 위함
+     */
+    public List<VideoDTO> getByIdList(List<Long> idList) {
+        return videoRepository.findAllById(idList)
                 .stream()
                 .map(v -> VideoDTO.toVideoDTO(v))
                 .collect(Collectors.toList());

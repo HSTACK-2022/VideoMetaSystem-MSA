@@ -3,10 +3,12 @@ package org.hstack.vmeta.videoMetadata.metadata.keyword;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name="keyword")
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

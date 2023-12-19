@@ -18,6 +18,17 @@ public class MetadataService {
     private KeywordRepository keywordRepository;
 
     /*
+     * 특정 id list에 해당하는 Metadata를 가져온다.
+     * videoMetadata에서 써먹기 위함
+     */
+    public List<MetadataDTO> getByIdList(List<Long> idList) {
+        return metadataRepository.findAllById(idList)
+                .stream()
+                .map(m -> MetadataDTO.toMetadataDTO(m))
+                .collect(Collectors.toList());
+    }
+
+    /*
      * MetadataDTO를 Metadata로 변환 후 저장한다.
      */
     public Long save(MetadataDTO metadataDTO) {
