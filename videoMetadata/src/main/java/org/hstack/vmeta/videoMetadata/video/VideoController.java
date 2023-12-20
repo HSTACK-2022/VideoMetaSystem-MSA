@@ -13,6 +13,10 @@ public class VideoController {
     @Autowired
     private VideoService videoService;
 
+    private static String logMessage(String funcName, Long id, boolean result) {
+        return "[video] " + funcName + " #" + id + " : " + result;
+    }
+
     @GetMapping
     public ResponseEntity<?> getAllVideo() {
         try {
@@ -27,7 +31,7 @@ public class VideoController {
     public ResponseEntity<?> saveVideo(@RequestBody VideoDTO videoDTO) {
         try {
             Long videoId = videoService.save(videoDTO);
-            String body = "save video #" + videoId + " succeed.";
+            String body = logMessage("save", videoId, true);
             return ResponseEntity.ok(body);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -38,7 +42,7 @@ public class VideoController {
     public ResponseEntity<?> deleteVideo(@RequestParam Long videoId) {
         try {
             videoService.delete(videoId);
-            String body = "delete video #" + videoId + " succeed.";
+            String body = logMessage("delete", videoId, true);
             return ResponseEntity.ok(body);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();

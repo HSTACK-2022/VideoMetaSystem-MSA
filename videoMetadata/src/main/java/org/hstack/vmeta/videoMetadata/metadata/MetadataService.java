@@ -41,11 +41,12 @@ public class MetadataService {
      * - 추후 업데이트 필요
      * - front단에서 어떻게 keyword를 받아올것인가에 대한 고민 필요
      */
-    public void update(MetadataDTO metadataDTO) {
+    public Long update(MetadataDTO metadataDTO) {
         Long videoId = metadataDTO.getId();
         List<Keyword> newKeyword = metadataDTO.getKeyword();
         keywordRepository.deleteByMid(videoId);
         keywordRepository.saveAll(newKeyword);
+        return videoId;
     }
 
     /*
