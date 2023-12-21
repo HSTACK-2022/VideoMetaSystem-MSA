@@ -1,6 +1,8 @@
 package org.hstack.vmeta.videoMetadata.metadata;
 
 import jakarta.transaction.Transactional;
+import org.hstack.vmeta.videoMetadata.metadata.category.Category;
+import org.hstack.vmeta.videoMetadata.metadata.category.CategoryType;
 import org.hstack.vmeta.videoMetadata.metadata.keyword.Keyword;
 import org.hstack.vmeta.videoMetadata.metadata.keyword.KeywordRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +14,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -60,6 +64,155 @@ class MetadataServiceTest {
 
         // then
         assertThat(resList.size()).isEqualTo(idList.size());
+    }
+
+    @Test
+    @DisplayName("검색 조건으로 메타데이터 조회 - 제목")
+    void getByFilterTitle() {
+        // given
+        String findText = "test";
+
+        List<Metadata> videoList = new ArrayList<>();
+        videoList.add(Metadata.builder().id(1L).title(findText).build());
+        videoList.add(Metadata.builder().id(2L).title(findText).build());
+        videoList.add(Metadata.builder().id(3L).title("user").build());
+
+        Set<MetadataMapping> savedIdList = new HashSet<>();
+        savedIdList.add(new MetadataMapping() {
+            @Override
+            public Long getId() {
+                return 1L;
+            }
+        });
+        savedIdList.add(new MetadataMapping() {
+            @Override
+            public Long getId() {
+                return 2L;
+            }
+        });
+
+        // mocking
+        given(metadataRepository.findByTitleContains(findText)).willReturn(savedIdList);
+
+        // when
+        List<Long> resList = metadataService.getByFilter(findText, null, null, null);
+
+        // then
+        assertThat(resList.size()).isEqualTo(savedIdList.size());
+    }
+
+    @Test
+    @DisplayName("검색 조건으로 메타데이터 조회 - 업로더")
+    void getByFilterUploaderName() {
+        // given
+        String findText = "test";
+
+        List<Metadata> videoList = new ArrayList<>();
+        videoList.add(Metadata.builder().id(1L).uploaderName(findText).build());
+        videoList.add(Metadata.builder().id(2L).uploaderName(findText).build());
+        videoList.add(Metadata.builder().id(3L).uploaderName("user").build());
+
+        Set<MetadataMapping> savedIdList = new HashSet<>();
+        savedIdList.add(new MetadataMapping() {
+            @Override
+            public Long getId() {
+                return 1L;
+            }
+        });
+        savedIdList.add(new MetadataMapping() {
+            @Override
+            public Long getId() {
+                return 2L;
+            }
+        });
+
+        // mocking
+        given(metadataRepository.findByUploaderNameContains(findText)).willReturn(savedIdList);
+
+        // when
+        List<Long> resList = metadataService.getByFilter(null, findText, null, null);
+
+        // then
+        assertThat(resList.size()).isEqualTo(savedIdList.size());
+    }
+
+    @Test
+    @DisplayName("검색 조건으로 메타데이터 조회 - 키워드")
+    void getByFilterKeyword() {
+        // given
+        String findText = "test";
+        List<Keyword> keywordList1 = new ArrayList<>();
+        keywordList1.add(Keyword.builder().keyword(findText).build());
+        List<Keyword> keywordList2 = new ArrayList<>();
+        keywordList2.add(Keyword.builder().keyword("user").build());
+
+        List<Metadata> videoList = new ArrayList<>();
+        videoList.add(Metadata.builder().id(1L).keyword(keywordList1).build());
+        videoList.add(Metadata.builder().id(2L).keyword(keywordList1).build());
+        videoList.add(Metadata.builder().id(3L).keyword(keywordList2).build());
+
+        Set<MetadataMapping> savedIdList = new HashSet<>();
+        savedIdList.add(new MetadataMapping() {
+            @Override
+            public Long getId() {
+                return 1L;
+            }
+        });
+        savedIdList.add(new MetadataMapping() {
+            @Override
+            public Long getId() {
+                return 2L;
+            }
+        });
+
+        // mocking
+        given(metadataRepository.findByKeywordContains(findText)).willReturn(savedIdList);
+
+        // when
+        List<Long> resList = metadataService.getByFilter(null, null, findText, null);
+
+        // then
+        assertThat(resList.size()).isEqualTo(savedIdList.size());
+    }
+
+
+    @Test
+    @DisplayName("검색 조건으로 메타데이터 조회 - 카테고리")
+    void getByFilterCategoryType() {
+        // given
+        CategoryType findType = CategoryType.IT;
+        List<Category> categoryList1 = new ArrayList<>();
+        categoryList1.add(Category.builder().categoryType(findType).build());
+        List<Category> categoryList2 = new ArrayList<>();
+        categoryList2.add(Category.builder().categoryType(CategoryType.ART).build());
+
+        List<Metadata> videoList = new ArrayList<>();
+        videoList.add(Metadata.builder().id(1L).category(categoryList1).build());
+        videoList.add(Metadata.builder().id(2L).category(categoryList1).build());
+        videoList.add(Metadata.builder().id(3L).category(categoryList2).build());
+
+        Set<MetadataMapping> savedIdList = new HashSet<>();
+        savedIdList.add(new MetadataMapping() {
+            @Override
+            public Long getId() {
+                return 1L;
+            }
+        });
+        savedIdList.add(new MetadataMapping() {
+            @Override
+            public Long getId() {
+                return 2L;
+            }
+        });
+
+        // mocking
+        given(metadataRepository.findByCategory(findType)).willReturn(savedIdList);
+
+        // when
+        List<Long> resList = metadataService.getByFilter(null, null, null, findType);
+
+        // then
+        assertThat(resList.size()).isEqualTo(savedIdList.size());
     }
 
     @Test

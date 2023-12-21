@@ -1,11 +1,15 @@
 package org.hstack.vmeta.videoMetadata.metadata;
 
+import org.hstack.vmeta.videoMetadata.metadata.category.CategoryType;
 import org.hstack.vmeta.videoMetadata.metadata.keyword.Keyword;
 import org.hstack.vmeta.videoMetadata.metadata.keyword.KeywordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +30,25 @@ public class MetadataService {
                 .stream()
                 .map(m -> MetadataDTO.toMetadataDTO(m))
                 .collect(Collectors.toList());
+    }
+
+    /*
+     * search용 filtering
+     * title, uploaderName, keyword, category가 포함된 idSet를 반환한다.
+     */
+    public List<Long> getByFilter(String title, String uploaderName, String keyword, CategoryType categoryType) {
+        List<MetadataMapping> idList = new ArrayList<>();
+        idList.addAll(metadataRepository.findByTitleContains(title));
+        idList.addAll(metadataRepository.findByUploaderNameContains(uploaderName));
+        idList.addAll(metadataRepository.findByKeywordContains(keyword));
+        idList.addAll(metadataRepository.findByCategory(categoryType));
+
+        Set<Long> idSet = new HashSet<>();
+        for (MetadataMapping mm : idList) {
+            idSet.add(mm.getId());
+        }
+
+        return idSet.stream().toList();
     }
 
     /*

@@ -35,7 +35,7 @@ public class Category {
      * << categoryType Matching >>
      * - 한국 표준 십진분류법에 맞게 ETRI TTA 표준 태그셋 매칭
      */
-    public final static Map<String, CategoryType> categoryTypeMap = new HashMap<String, CategoryType>() {
+    public final static Map<String, CategoryType> apiVal2CategoryType = new HashMap<String, CategoryType>() {
         {
             put("TMI_HW", CategoryType.IT);
             put("TMI_SW", CategoryType.IT);
@@ -164,7 +164,7 @@ public class Category {
     };
 
     // 사실 여기서 쓸건 아닌데 나중에 다른 모듈 할때 복붙 편하라고...
-    public final static Map<CategoryType, String> categoryMap = new HashMap<CategoryType, String>() {
+    public final static Map<CategoryType, String> category2Str = new HashMap<CategoryType, String>() {
         {
             put(CategoryType.POLITICS, "행정");
             put(CategoryType.ECONOMY, "경제");

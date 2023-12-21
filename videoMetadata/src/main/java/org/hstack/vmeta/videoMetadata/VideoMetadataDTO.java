@@ -1,9 +1,6 @@
-package org.hstack.vmeta.videoMetadata.metadata;
+package org.hstack.vmeta.videoMetadata;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hstack.vmeta.videoMetadata.metadata.category.Category;
 import org.hstack.vmeta.videoMetadata.metadata.indexScript.IndexScript;
 import org.hstack.vmeta.videoMetadata.metadata.keyword.Keyword;
@@ -20,12 +17,13 @@ import java.util.List;
  * search, detailView 등 user에게 보여지는 영역용
  */
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class VideoMetadataDTO {
 
-    private Long Id;
+    private Long id;
 
     private String title;
 
