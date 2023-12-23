@@ -1,6 +1,9 @@
-package org.hstack.vmeta.videoMetadata.video;
+package org.hstack.vmeta.videoMetadata.metadata;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hstack.vmeta.videoMetadata.video.VideoController;
+import org.hstack.vmeta.videoMetadata.video.VideoDTO;
+import org.hstack.vmeta.videoMetadata.video.VideoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,80 +16,42 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-@WebMvcTest(VideoController.class)
-class VideoControllerTest {
+@WebMvcTest(MetadataController.class)
+class MetadataControllerTest {
 
     @Autowired
     MockMvc mockMvc;
 
     @MockBean
-    VideoService videoService;
+    MetadataService metadataService;
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    final String baseUrl = "/video";
+    final String baseUrl = "/metadata";
 
     @BeforeEach
     void init() {
     }
 
     @Test
-    @DisplayName("전체 비디오 조회")
-    void getAllVideo() throws Exception{
+    @DisplayName("메타데이터 저장")
+    void saveMetadata() throws Exception {
         // given
-        List<VideoDTO> savedVideoDTOList = new ArrayList<>();
-        savedVideoDTOList.add(VideoDTO.builder()
-                .id(1L)
-                .title("testTitle1")
-                .uploaderName("testUploader1")
-                .thumbnailPath("/test/1L/path.mp4")
-                .build());
-        savedVideoDTOList.add(VideoDTO.builder()
-                .id(2L)
-                .title("testTitle2")
-                .uploaderName("testUploader2")
-                .thumbnailPath("/test/2L/path.mp4")
-                .build());
-
-        // mocking
-        given(videoService.getAll()).willReturn(savedVideoDTOList);
-
-        // when
-        final ResultActions actions =
-                mockMvc.perform(
-                        get(baseUrl)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .characterEncoding("UTF-8")
-                );
-
-        // then
-        actions.andExpect(status().isOk())
-                .andExpect(jsonPath("$[0]").exists())
-                .andExpect(jsonPath("$[1]").exists())
-                .andDo(print());
-    }
-
-    @Test
-    @DisplayName("비디오 저장")
-    void saveVideo() throws Exception {
-        // given
-        VideoDTO videoDTO = VideoDTO.builder().title("testTitle").build();
+        MetadataDTO metadataDTO = MetadataDTO.builder().build();
         Long expectVideoId = 0L;
 
         // mocking
-        given(videoService.save(videoDTO)).willReturn(expectVideoId);
+        given(metadataService.save(metadataDTO)).willReturn(expectVideoId);
 
         // when
         final ResultActions actions =
@@ -94,7 +59,7 @@ class VideoControllerTest {
                         post(baseUrl)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(videoDTO))
+                                .content(objectMapper.writeValueAsString(metadataDTO))
                                 .characterEncoding("UTF-8")
                 );
 
@@ -104,25 +69,50 @@ class VideoControllerTest {
     }
 
     @Test
-    @DisplayName("비디오 삭제")
-    void deleteVideo() throws Exception{
+    @DisplayName("메타데이터 업데이트 - 키워드")
+    void updateMetadata() throws Exception {
         // given
-        Long videoId = 1L;
+        MetadataDTO metadataDTO = MetadataDTO.builder().build();
+        Long expectVideoId = 0L;
 
         // mocking
+        given(metadataService.update(metadataDTO)).willReturn(expectVideoId);
 
         // when
         final ResultActions actions =
                 mockMvc.perform(
-                        get(baseUrl + "/delete")
+                        post(baseUrl)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .param("videoId", String.valueOf(videoId))
+                                .content(objectMapper.writeValueAsString(metadataDTO))
                                 .characterEncoding("UTF-8")
                 );
 
         // then
         actions.andExpect(status().isOk())
                 .andDo(print());
+    }
+
+    @Test
+    @DisplayName("메타데이터 삭제")
+    void deleteMetadata() throws Exception{
+            // given
+            Long videoId = 1L;
+
+            // mocking
+
+            // when
+            final ResultActions actions =
+                    mockMvc.perform(
+                            get(baseUrl + "/delete")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .accept(MediaType.APPLICATION_JSON)
+                                    .param("videoId", String.valueOf(videoId))
+                                    .characterEncoding("UTF-8")
+                    );
+
+            // then
+            actions.andExpect(status().isOk())
+                    .andDo(print());
     }
 }

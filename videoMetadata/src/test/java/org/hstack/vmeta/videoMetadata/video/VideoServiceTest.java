@@ -60,15 +60,40 @@ class VideoServiceTest {
     }
 
     @Test
+    @DisplayName("특정 비디오 조회")
+    void getByIdList() {
+        // given
+        List<Long> idList = new ArrayList<>();
+        idList.add(1L);
+        idList.add(2L);
+
+        List<Video> videoList = new ArrayList<>();
+        videoList.add(Video.builder().id(1L).title("testTitle1").build());
+        videoList.add(Video.builder().id(2L).title("testTitle2").build());
+        videoList.add(Video.builder().id(3L).title("testTitle3").build());
+
+        List<Video> savedList = videoList.subList(0, idList.size());
+
+        // mocking
+        given(videoRepository.findAllById(idList)).willReturn(savedList);
+
+        // when
+        List<VideoDTO> resList = videoService.getByIdList(idList);
+
+        // then
+        assertThat(resList.size()).isEqualTo(idList.size());
+    }
+
+    @Test
     @DisplayName("비디오 저장")
     @Transactional
     void save() {
         // given
         VideoDTO videoDTO = VideoDTO.builder().title("testTitle").build();
-        Video saveVideo = videoDTO.videoDTO2Video();
+        Video saveVideo = videoDTO.toVideo();
 
         // mocking
-        given(videoRepository.save(any())).willReturn(videoDTO.videoDTO2Video());
+        given(videoRepository.save(any())).willReturn(videoDTO.toVideo());
 
         // when
         Long newId = videoService.save(videoDTO);

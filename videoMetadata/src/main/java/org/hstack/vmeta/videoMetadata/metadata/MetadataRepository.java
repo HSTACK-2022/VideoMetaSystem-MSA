@@ -11,7 +11,7 @@ import java.util.Set;
 
 public interface MetadataRepository extends JpaRepository<Metadata, Long> {
 
-    Metadata save(Metadata video);
+    Metadata save(Metadata metadata);
 
     Optional<Metadata> findById(Long id);
 
@@ -24,7 +24,6 @@ public interface MetadataRepository extends JpaRepository<Metadata, Long> {
 
     @Query("select m from Metadata m join fetch m.category c where c.categoryType = :category")
     Set<MetadataMapping> findByCategory(@Param("category") CategoryType category);
-
 
     void deleteById(Long id);
 
