@@ -24,6 +24,12 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
+
+	// SwaggerUI
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+
+	// openCV
+	implementation 'org.openpnp:opencv:4.8.1-0'
 }
 
 tasks.named('test') {
