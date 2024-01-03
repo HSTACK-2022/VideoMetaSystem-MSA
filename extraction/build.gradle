@@ -30,6 +30,9 @@ dependencies {
 
 	// openCV
 	implementation 'org.openpnp:opencv:4.8.1-0'
+
+	// file extension
+	implementation 'commons-io:commons-io:2.15.1'
 }
 
 tasks.named('test') {
