@@ -6,6 +6,7 @@ import org.hstack.vmeta.extraction.basic.videoFrame.VideoFrame;
 import org.hstack.vmeta.extraction.basic.videoFrame.VideoFrameAttributeConverter;
 import org.hstack.vmeta.extraction.basic.videoType.VideoType;
 import org.hstack.vmeta.extraction.basic.videoType.VideoTypeAttributeConverter;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
@@ -14,17 +15,22 @@ import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.Videoio;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.Time;
+import java.util.InputMismatchException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.failBecauseExceptionWasNotThrown;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @WebMvcTest
 class BasicExtractionServiceTest {
 
     String testVideoPath = "E:\\WEEK4_01.mp4";
+    String testFailVideoPath = "E:\\WEEK4_01";
 
     @Test
+    @DisplayName("Basic MD 추출 - 성공")
     void extractBasicDTO() {
         try {
             // 파일로 open
@@ -50,5 +56,42 @@ class BasicExtractionServiceTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    @DisplayName("Basic MD 추출 - 실패 : 잘못된 fps")
+    void extractBasicDTO_Fail_WrongFps() throws Exception {
+        try {
+
+            VideoFrame videoFrame = VideoFrameAttributeConverter.convert(10.0);
+
+            if (videoFrame == null) {
+                throw new InputMismatchException();
+            }
+        } catch (InputMismatchException e) {
+            e.printStackTrace();
+            return;
+        }
+        failBecauseExceptionWasNotThrown(InputMismatchException.class);
+    }
+
+    @Test
+    @DisplayName("Basic MD 추출 - 실패 : 잘못된 파일 경로")
+    void extractBasicDTO_Fail_WrongPath() throws Exception {
+        try {
+            // 파일로 open
+            File f = new File(testFailVideoPath);
+            String ext = FilenameUtils.getExtension(f.getName());
+            VideoType videoType = VideoTypeAttributeConverter.convert(ext);
+
+            if (videoType == null) {
+                throw new FileNotFoundException();
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return;
+        }
+        failBecauseExceptionWasNotThrown(FileNotFoundException.class);
     }
 }

@@ -12,7 +12,9 @@ import org.opencv.videoio.Videoio;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.Time;
+import java.util.InputMismatchException;
 
 @Service
 public class BasicExtractionService {
@@ -20,8 +22,21 @@ public class BasicExtractionService {
     public BasicDTO extractBasicDTO(String filePath) {
 
         try {
+            // return val
+            Time length;
+            Long videoSize;
+            VideoType videoType;
+            VideoFrame videoFrame;
+
             // 파일로 open
             File f = new File(filePath);
+            String ext = FilenameUtils.getExtension(f.getName());
+            videoType = VideoTypeAttributeConverter.convert(ext);
+
+            // exception : wrong file path
+            if (videoType == null) {
+                throw new FileNotFoundException();
+            }
 
             // videoCapture로 open
             System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -29,11 +44,15 @@ public class BasicExtractionService {
             videoCapture.open(filePath);
 
             int timeSec = (int) (videoCapture.get(Videoio.CAP_PROP_FRAME_COUNT) / videoCapture.get(Videoio.CAP_PROP_FPS));
+            length = TimeConverter.convert(timeSec);
 
-            Time length = TimeConverter.convert(timeSec);
-            Long videoSize = f.length();
-            VideoType videoType = VideoTypeAttributeConverter.convert(FilenameUtils.getExtension(f.getName()));
-            VideoFrame videoFrame = VideoFrameAttributeConverter.convert(videoCapture.get(Videoio.CAP_PROP_FPS));
+            videoSize = f.length();
+            videoFrame = VideoFrameAttributeConverter.convert(videoCapture.get(Videoio.CAP_PROP_FPS));
+
+            // exception : wrong fps
+            if (videoFrame == null) {
+                throw new InputMismatchException();
+            }
 
             return BasicDTO.builder()
                     .length(length)
@@ -42,7 +61,14 @@ public class BasicExtractionService {
                     .videoFrame(videoFrame)
                     .build();
 
+        } catch(FileNotFoundException fe) {
+            // TODO : Logging
+            fe.printStackTrace();
+        } catch (InputMismatchException ie) {
+            // TODO : Logging
+            ie.printStackTrace();
         } catch (Exception e) {
+            // TODO : Logging
             e.printStackTrace();
         } finally {
             return null;
