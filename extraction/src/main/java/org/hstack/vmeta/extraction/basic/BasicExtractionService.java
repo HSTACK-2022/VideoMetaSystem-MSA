@@ -19,6 +19,13 @@ import java.util.InputMismatchException;
 @Service
 public class BasicExtractionService {
 
+    /*
+     * 영상 기본 정보 추출
+     * @param
+     * - filePath : 영상 파일 경로
+     * @returnVal
+     * - length, videoSize, videoType(ext), videoFrame(fps)
+     */
     public BasicDTO extractBasicDTO(String filePath) {
 
         try {
