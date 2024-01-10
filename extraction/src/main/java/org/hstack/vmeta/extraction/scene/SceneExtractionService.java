@@ -11,13 +11,14 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.*;
 import java.sql.Time;
 import java.util.InputMismatchException;
 
 @Service
 public class SceneExtractionService {
 
-    private static final int CHANGE_DETECT_VALUE = 15;
+    private static final int CHANGE_DETECT_VALUE = 30;
 
     /*
      * 영상 기본 정보 추출
@@ -29,13 +30,17 @@ public class SceneExtractionService {
     public SceneDTO extractSceneDTO(String filePath) {
 
         try {
+
+            extractFrameImage(filePath);        // 장면 추출
+            // TODO : judge narrative, presentation by using tensorflow
+
             // return val
             Narrative narrative;
             Presentation presentation;
 
             return SceneDTO.builder()
-                    .narrative(narrative)
-                    .presentation(presentation)
+//                    .narrative(narrative)
+//                    .presentation(presentation)
                     .build();
 
         } catch (InputMismatchException ie) {
@@ -56,10 +61,13 @@ public class SceneExtractionService {
      * @returnVal
      * - flag : 성공 여부
      */
-    private boolean extractFrameImage(String filePath) {
+    boolean extractFrameImage(String filePath) {
         try {
-            // TODO : create dir
-            String dirPath;
+            // img 파일을 저장할 폴더 생성
+            String dirPath = Paths.get(filePath).getParent().toString()
+                    + File.separator
+                    + "frames";
+            Files.createDirectory(Paths.get(dirPath));
 
             // videoCapture로 open
             System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -71,7 +79,7 @@ public class SceneExtractionService {
             int width = (int) videoCapture.get(Videoio.CAP_PROP_FRAME_WIDTH);
             int height = (int) videoCapture.get(Videoio.CAP_PROP_FRAME_HEIGHT);
 
-            int frameNo = 0;
+            long frameSec = 0;
             Mat pframe = new Mat(width, height, CvType.CV_8UC3);     // prev frame
             Mat cframe = new Mat(width, height, CvType.CV_8UC3);     // curr frame
 
@@ -80,23 +88,37 @@ public class SceneExtractionService {
 
                 if (cframe.empty() || pframe.empty()) { // 1. 만약 더 이상 불러올 프레임이 없는 경우
                     break;                              // 종료
-                } else if (frameNo == 0) {              // 2. 첫 프레임인 경우
-                    OpencvCalculator.saveImage(cframe, dirPath, 0);         // 해당 이미지 저장
-                } else if (frameNo % fps == 0) {        // 3. 그 외의 경우 : 1초마다
+                } else if (frameSec == 0) {             // 2. 첫 프레임인 경우
+                    OpencvCalculator.saveImage(cframe, dirPath, 0);     // 해당 이미지 저장
+                } else if (frameSec % fps == 0) {       // 3. 그 외의 경우 : 1초마다
                     double psnr = OpencvCalculator.getPSNR(pframe, cframe);
-                    if (0 < psnr && psnr < CHANGE_DETECT_VALUE) {                   // psnr이 기준 이하이면
-                        OpencvCalculator.saveImage(cframe, dirPath, frameNo/fps);   // 해당 이미지 저장
+                    if (0 < psnr && psnr < CHANGE_DETECT_VALUE) {               // psnr이 기준 이하이면
+                        OpencvCalculator.saveImage(cframe, dirPath, frameSec);  // 해당 이미지 저장
                     }
                 }
 
-                pframe = cframe;            // curr frame 과거 처리
-                frameNo++;                  // 프레임번호 추가
+                pframe = cframe;                    // curr frame 과거 처리
+                frameSec++;                         // 프레임번호 추가
+
+                // 시간 단축을 위해 fps만큼의 프레임을 미리 읽는다.
+                Mat m = new Mat();
+                for (int i = 0; i < fps; i++) {
+                    videoCapture.read(m);
+                }
             }
 
             return true;
+
+        } catch (FileAlreadyExistsException fe) {   // 해당 폴더가 이미 있는 경우
+            // TODO : logging
+            fe.printStackTrace();
+        } catch (NoSuchFileException ne) {          // 해당 경로가 존재하지 않는 경우
+            // TODO : logging
+            ne.printStackTrace();
         } catch (Exception e) {
             // TODO : logging
             e.printStackTrace();
+        } finally {
             return false;
         }
     }
