@@ -4,7 +4,7 @@ import java.sql.Time;
 
 public class TimeConverter {
 
-    public static Time convert(int sec) {
+    public static Time convert2Time(int sec) {
 
         int hh = sec/3600;
         sec %= 3600;
@@ -14,4 +14,5 @@ public class TimeConverter {
 
         return new Time(hh, mm, sec);
     }
+
 }

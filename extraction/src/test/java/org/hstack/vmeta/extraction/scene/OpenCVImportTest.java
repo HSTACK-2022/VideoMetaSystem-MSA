@@ -1,4 +1,4 @@
-package org.hstack.vmeta.extraction;
+package org.hstack.vmeta.extraction.scene;
 
 import org.junit.jupiter.api.Test;
 import org.opencv.core.Core;

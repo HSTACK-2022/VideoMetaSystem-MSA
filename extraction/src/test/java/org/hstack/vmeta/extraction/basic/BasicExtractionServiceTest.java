@@ -43,7 +43,7 @@ class BasicExtractionServiceTest {
 
             int timeSec = (int) (videoCapture.get(Videoio.CAP_PROP_FRAME_COUNT) / videoCapture.get(Videoio.CAP_PROP_FPS));
 
-            Time length = TimeConverter.convert(timeSec);
+            Time length = TimeConverter.convert2Time(timeSec);
             Long videoSize = f.length();
             VideoType videoType = VideoTypeAttributeConverter.convert(FilenameUtils.getExtension(f.getName()));
             VideoFrame videoFrame = VideoFrameAttributeConverter.convert(videoCapture.get(Videoio.CAP_PROP_FPS));

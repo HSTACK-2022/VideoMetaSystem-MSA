@@ -1,4 +1,4 @@
-License of 3rd party libraries
+# License of 3rd party libraries
 
 > VMeta-MSA (Video Meta System) Project is licensed under the terms of the <a href="./README.md">GPL v3.0</a>. <br/>
 > But, VMeta-MSA includes a few 3rd party Open-Source libraries, which are licensed under their own.

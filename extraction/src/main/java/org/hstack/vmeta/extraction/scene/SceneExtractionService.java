@@ -21,7 +21,7 @@ public class SceneExtractionService {
     private static final int CHANGE_DETECT_VALUE = 30;
 
     /*
-     * 영상 기본 정보 추출
+     * 영상 정보 추출
      * @param
      * - filePath : 영상 파일 경로
      * @returnVal
