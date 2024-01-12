@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface KeywordRepository extends JpaRepository<Keyword, Long> {
 
-    List<Keyword> saveAll(List<Keyword>keywordList);
+    // List<Keyword> saveAll(List<Keyword> keywordList);
 
     void deleteByMid(Long mid);
 }

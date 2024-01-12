@@ -24,6 +24,22 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
+
+	// SwaggerUI
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+
+	// openCV
+	implementation 'org.openpnp:opencv:4.8.1-0'
+
+	// file extension
+	implementation 'commons-io:commons-io:2.15.1'
+
+	// ffmpeg
+	implementation 'net.bramp.ffmpeg:ffmpeg:0.7.0'
+
+	// json, gson
+	implementation 'com.google.code.gson:gson:2.8.6'
+	implementation 'net.minidev:json-smart:2.5.0'
 }
 
 tasks.named('test') {
