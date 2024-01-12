@@ -8,6 +8,8 @@ import java.util.List;
 @Service
 public class AudioExtractionService {
 
+    private static final FFmpegCalculator ffmpegCalculater = new FFmpegCalculator();
+
     /*
      * 음성 정보 추출
      * @param
@@ -19,7 +21,7 @@ public class AudioExtractionService {
 
         try {
 
-            FFmpegCalculator.videoPreprocessing(filePath);
+            ffmpegCalculater.videoPreprocessing(filePath);
             // TODO : call STT Service
 
             // return val

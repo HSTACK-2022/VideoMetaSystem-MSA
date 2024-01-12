@@ -14,15 +14,15 @@ import java.nio.file.Paths;
 class FFmpegCalculator {
 
     @Value("${ffmpeg.location}")
-    private static String ffmpegPath;
+    private String ffmpegPath;
 
     @Value("${ffprobe.location}")
-    private static String ffprobePath;
+    private String ffprobePath;
 
     private static final String SECORIGIN = "10";
 
 
-    public static boolean videoPreprocessing(String filePath) {
+    public boolean videoPreprocessing(String filePath) {
         try {
 
             // make audio dir
@@ -45,7 +45,7 @@ class FFmpegCalculator {
         }
     }
 
-    private static String convertVideo2Audio(String filePath) throws Exception {
+    private String convertVideo2Audio(String filePath) throws Exception {
 
         String dirPath = Paths.get(filePath).getParent().toString() + File.separator + "audio";
         String expectFilePath = dirPath + File.separator + "extracted.wav";
@@ -71,7 +71,7 @@ class FFmpegCalculator {
         return expectFilePath;
     }
 
-    private static void splitAudioWithSec(String audioFilepath) throws Exception {
+    private void splitAudioWithSec(String audioFilepath) throws Exception {
 
         String dirPath = Paths.get(audioFilepath).getParent().toString();
 

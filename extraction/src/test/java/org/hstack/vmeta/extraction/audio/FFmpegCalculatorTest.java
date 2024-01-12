@@ -33,6 +33,7 @@ class FFmpegCalculatorTest {
 
 
     @Test
+    @DisplayName("실행 전 폴더 생성")
     void videoPreprocessing() {
         try {
             // given
