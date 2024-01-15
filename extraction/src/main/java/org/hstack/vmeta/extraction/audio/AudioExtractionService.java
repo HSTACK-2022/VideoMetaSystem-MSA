@@ -8,7 +8,8 @@ import java.util.List;
 @Service
 public class AudioExtractionService {
 
-    private static final FFmpegCalculator ffmpegCalculater = new FFmpegCalculator();
+    private FFmpegCalculator ffmpegCalculater;
+    private SttCalculator sttCalculator;
 
     /*
      * 음성 정보 추출
@@ -21,14 +22,11 @@ public class AudioExtractionService {
 
         try {
 
-            ffmpegCalculater.videoPreprocessing(filePath);
-            // TODO : call STT Service
-
-            // return val
-            List<Script> script;
+            new FFmpegCalculator().videoPreprocessing(filePath);
+            List<Script> script = new SttCalculator().getScriptList(filePath);
 
             return AudioDTO.builder()
-//                    .script(script)
+                    .script(script)
                     .build();
 
         } catch (Exception e) {
