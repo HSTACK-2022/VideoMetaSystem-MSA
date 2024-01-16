@@ -6,12 +6,15 @@ import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-class FFmpegCalculator {
+@Component
+public class FFmpegCalculator {
 
     @Value("${ffmpeg.location}")
     private String ffmpegPath;
@@ -20,7 +23,6 @@ class FFmpegCalculator {
     private String ffprobePath;
 
     private static final String SECORIGIN = "10";
-
 
     public boolean videoPreprocessing(String filePath) {
         try {

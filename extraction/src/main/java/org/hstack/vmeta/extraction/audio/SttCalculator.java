@@ -3,6 +3,7 @@ package org.hstack.vmeta.extraction.audio;
 
 import org.hstack.vmeta.extraction.basic.time.TimeConverter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -12,10 +13,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-class SttCalculator {
+@Component
+public class SttCalculator {
 
     @Value("${etri.keys}")
-    private String[] ETRI_API_KEY_SIZE;
+    private String[] ETRI_API_KEY;
 
     /*
      * filePath에 해당하는 비디오 파일에 대해 SttThread를 호출한다.
@@ -27,13 +29,13 @@ class SttCalculator {
     public List<AudioDTO.Script> getScriptList(String filePath) {
         try {
             // 스레드 풀 생성
-            int keySize = ETRI_API_KEY_SIZE.length;
+            int keySize = ETRI_API_KEY.length;
             ExecutorService threadPool = Executors.newFixedThreadPool(keySize);
 
             // Key의 개수만큼 스레드 생성 및 초기화
             SttThread[] sttThreads = new SttThread[keySize];
             for (int i = 0; i < keySize; i++) {
-                sttThreads[i] = new SttThread(ETRI_API_KEY_SIZE[i]);
+                sttThreads[i] = new SttThread(ETRI_API_KEY[i]);
             }
 
             // filePath에서 audioDir 경로 얻기

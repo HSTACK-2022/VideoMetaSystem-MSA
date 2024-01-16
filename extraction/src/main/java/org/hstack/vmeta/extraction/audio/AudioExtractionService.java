@@ -1,6 +1,8 @@
 package org.hstack.vmeta.extraction.audio;
 
+import lombok.RequiredArgsConstructor;
 import org.hstack.vmeta.extraction.audio.AudioDTO.Script;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -8,8 +10,12 @@ import java.util.List;
 @Service
 public class AudioExtractionService {
 
-    private FFmpegCalculator ffmpegCalculater;
+    @Autowired
+    private FFmpegCalculator ffmpegCalculator;
+
+    @Autowired
     private SttCalculator sttCalculator;
+
 
     /*
      * 음성 정보 추출
@@ -19,20 +25,15 @@ public class AudioExtractionService {
      * - script
      */
     public AudioDTO extractAudioDTO(String filePath) {
-
         try {
-
-            new FFmpegCalculator().videoPreprocessing(filePath);
-            List<Script> script = new SttCalculator().getScriptList(filePath);
-
+            ffmpegCalculator.videoPreprocessing(filePath);
+            List<Script> script = sttCalculator.getScriptList(filePath);
             return AudioDTO.builder()
                     .script(script)
                     .build();
-
         } catch (Exception e) {
             // TODO : Logging
             e.printStackTrace();
-        } finally {
             return null;
         }
     }
