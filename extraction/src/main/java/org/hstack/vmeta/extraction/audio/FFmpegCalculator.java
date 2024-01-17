@@ -31,7 +31,6 @@ public class FFmpegCalculator {
             String dirPath = Paths.get(filePath).getParent().toString()
                     + File.separator
                     + "audio";
-            Files.createDirectory(Paths.get(dirPath));
 
             // do logic
             String aduioFilePath = convertVideo2Audio(filePath);
