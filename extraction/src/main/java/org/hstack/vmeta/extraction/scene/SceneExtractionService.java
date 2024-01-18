@@ -1,5 +1,6 @@
 package org.hstack.vmeta.extraction.scene;
 
+import org.hstack.vmeta.extraction.basic.BasicDTO;
 import org.hstack.vmeta.extraction.scene.narrative.Narrative;
 import org.hstack.vmeta.extraction.scene.presentation.Presentation;
 import org.opencv.core.Core;
@@ -16,9 +17,32 @@ import java.sql.Time;
 import java.util.InputMismatchException;
 
 @Service
-public class SceneExtractionService {
+public class SceneExtractionService implements Runnable {
+
 
     private static final int CHANGE_DETECT_VALUE = 30;
+
+    private String filePath;
+    private SceneDTO sceneDTO;
+
+    /*
+     * getter, setter
+     */
+    public void init(String filePath) {
+        this.filePath = filePath;
+    }
+    public SceneDTO getResult() {
+        return sceneDTO;
+    }
+
+    /*
+     * 스레드를 위한 run()
+     */
+    @Override
+    public void run() {
+        extractSceneDTO();
+    }
+
 
     /*
      * 영상 정보 추출
@@ -27,7 +51,7 @@ public class SceneExtractionService {
      * @returnVal
      * - narrative, presentation
      */
-    public SceneDTO extractSceneDTO(String filePath) {
+    private SceneDTO extractSceneDTO() {
 
         try {
 

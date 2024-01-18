@@ -3,6 +3,7 @@ package org.hstack.vmeta.extraction.audio;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
 import org.hstack.vmeta.extraction.audio.AudioDTO.Script;
+import org.hstack.vmeta.extraction.basic.BasicDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,13 +13,36 @@ import java.nio.file.Paths;
 import java.util.List;
 
 @Service
-public class AudioExtractionService {
+public class AudioExtractionService implements Runnable {
+
 
     @Autowired
     private FFmpegCalculator ffmpegCalculator;
 
     @Autowired
     private SttCalculator sttCalculator;
+
+
+    private String filePath;
+    private AudioDTO audioDTO;
+
+    /*
+     * getter, setter
+     */
+    public void init(String filePath) {
+        this.filePath = filePath;
+    }
+    public AudioDTO getResult() {
+        return audioDTO;
+    }
+
+    /*
+     * 스레드를 위한 run()
+     */
+    @Override
+    public void run() {
+        extractAudioDTO();
+    }
 
 
     /*
@@ -28,7 +52,7 @@ public class AudioExtractionService {
      * @returnVal
      * - script
      */
-    public AudioDTO extractAudioDTO(String filePath) {
+    private AudioDTO extractAudioDTO() {
         try {
 
             // make audio dir

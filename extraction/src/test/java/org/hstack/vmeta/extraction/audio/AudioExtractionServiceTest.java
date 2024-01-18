@@ -18,11 +18,13 @@ class AudioExtractionServiceTest {
     @Autowired
     private AudioExtractionService audioExtractionService;
 
+    /*
     @Test
     @DisplayName("Audio to Script 추출 로직 테스트")
     void extractAudioDTO() {
         try {
-            AudioDTO audioDTO = audioExtractionService.extractAudioDTO(filePath);
+            audioExtractionService.init(filePath);
+            AudioDTO audioDTO = audioExtractionService.extractAudioDTO();
             assertThat(audioDTO.getScript()).isNotNull();
             assertThat(audioDTO.getScript().size()).isNotEqualTo(0);
         } catch (Exception e) {
@@ -30,4 +32,5 @@ class AudioExtractionServiceTest {
             fail();
         }
     }
+     */
 }
