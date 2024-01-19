@@ -16,11 +16,12 @@ public class AudioDTO {
 
     private List<Script> script;
 
-    class Script {
+    @Builder
+    public static class Script {
 
-        private Long id;
-        private Time time;
-        private String content;
+        Long id;
+        Time time;
+        String content;
 
     }
 }

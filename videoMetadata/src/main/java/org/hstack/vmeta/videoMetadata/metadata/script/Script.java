@@ -17,7 +17,12 @@ public class Script {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private Time time;
+
     private String content;
+
+    @Column(name="metadata_id")
+    private Long mid;
 
 }

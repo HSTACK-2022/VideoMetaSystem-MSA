@@ -17,7 +17,28 @@ import java.sql.Time;
 import java.util.InputMismatchException;
 
 @Service
-public class BasicExtractionService {
+public class BasicExtractionService implements Runnable {
+
+    private String filePath;
+    private BasicDTO basicDTO;
+
+    /*
+     * getter, setter
+     */
+    public void init(String filePath) {
+        this.filePath = filePath;
+    }
+    public BasicDTO getResult() {
+        return basicDTO;
+    }
+
+    /*
+     * 스레드를 위한 run()
+     */
+    @Override
+    public void run() {
+        extractBasicDTO();
+    }
 
     /*
      * 영상 기본 정보 추출
@@ -26,7 +47,7 @@ public class BasicExtractionService {
      * @returnVal
      * - length, videoSize, videoType(ext), videoFrame(fps)
      */
-    public BasicDTO extractBasicDTO(String filePath) {
+    private void extractBasicDTO() {
 
         try {
             // return val
@@ -61,12 +82,14 @@ public class BasicExtractionService {
                 throw new InputMismatchException();
             }
 
-            return BasicDTO.builder()
+            basicDTO = BasicDTO.builder()
                     .length(length)
                     .videoSize(videoSize)
                     .videoType(videoType)
                     .videoFrame(videoFrame)
                     .build();
+
+            return;
 
         } catch(FileNotFoundException fe) {
             // TODO : Logging
@@ -77,8 +100,9 @@ public class BasicExtractionService {
         } catch (Exception e) {
             // TODO : Logging
             e.printStackTrace();
-        } finally {
-            return null;
         }
+
+        basicDTO = null;
     }
+    
 }
