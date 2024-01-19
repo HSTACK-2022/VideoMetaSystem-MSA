@@ -17,15 +17,16 @@ public class KeywordExtractionService {
     public KeywordDTO extractKeywordDTO(String filePath) {
         try {
 
-            List<KeywordDTO.Keyword> keyword = KeywordCalculator.getKeywordList(filePath);
-
-            return KeywordDTO.builder()
-                    .keyword(keyword)
-                    .build();
+//            List<KeywordDTO.Keyword> keyword = KeywordCalculator.getKeywordList(filePath);
+//
+//            return KeywordDTO.builder()
+//                    .keyword(keyword)
+//                    .build();
 
         } catch (Exception e) {
             // TODO : logging
-            return null;
         }
+
+        return null;
     }
 }

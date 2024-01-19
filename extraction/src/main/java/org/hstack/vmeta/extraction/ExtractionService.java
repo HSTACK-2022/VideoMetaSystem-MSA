@@ -8,7 +8,6 @@ import org.hstack.vmeta.extraction.keyword.KeywordExtractionService;
 import org.hstack.vmeta.extraction.scene.SceneDTO;
 import org.hstack.vmeta.extraction.scene.SceneExtractionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ExecutorService;
@@ -54,11 +53,23 @@ public class ExtractionService {
 
             return MetadataDTO.builder()
                     .id(id)
+                    .length(basicDTO.getLength())
+                    .videoSize(basicDTO.getVideoSize())
+                    .videoType(basicDTO.getVideoType())
+                    .videoFrame(basicDTO.getVideoFrame())
+                    .script(audioDTO.getScript())
+                    .narrative(sceneDTO.getNarrative())
+                    .presentation(sceneDTO.getPresentation())
+//                    .keyword(keywordDTO.getKeyword())
+//                    .indexScript(indexScriptDTO.getIndexScript())
+//                    .category(categoryDTO.getCategory())
                     .build();
 
         } catch (Exception e) {
             // TODO : Logging
             e.printStackTrace();
         }
+
+        return null;
     }
 }

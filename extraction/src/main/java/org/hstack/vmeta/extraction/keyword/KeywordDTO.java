@@ -16,7 +16,7 @@ public class KeywordDTO {
     private List<Keyword> keyword;
 
     @Builder
-    static class Keyword {
+    public static class Keyword {
         Long id;
         String keyword;
         float perc;

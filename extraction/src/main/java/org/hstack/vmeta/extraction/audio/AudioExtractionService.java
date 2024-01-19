@@ -22,7 +22,6 @@ public class AudioExtractionService implements Runnable {
     @Autowired
     private SttCalculator sttCalculator;
 
-
     private String filePath;
     private AudioDTO audioDTO;
 
@@ -73,6 +72,7 @@ public class AudioExtractionService implements Runnable {
             
             // 메타데이터 추출 후 하위 폴더와 파일 모두 삭제
             FileUtils.cleanDirectory(audioDir);
+            audioDir.delete();
             
             return AudioDTO.builder()
                     .script(script)
