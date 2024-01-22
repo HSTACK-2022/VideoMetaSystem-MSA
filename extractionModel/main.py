@@ -2,12 +2,11 @@ import uvicorn
 import configparser
 
 from fastapi import FastAPI
-
-from routers import languageRouter
+from routers import router
 
 def createApp():
     app = FastAPI()
-    app.include_router(languageRouter.router)
+    app.include_router(router.router)
     return app
 
 

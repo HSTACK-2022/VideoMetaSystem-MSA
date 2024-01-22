@@ -9,9 +9,6 @@
 # 240119 -          : translate from VideoMetaSystem/Flask/hstack/uploadApi/keywordService.py
 ###########################################################################################
 
-from tabnanny import verbose
-import konlpy
-
 from konlpy.tag import Okt
 from krwordrank.word import summarize_with_keywords
 from krwordrank.hangle import normalize
