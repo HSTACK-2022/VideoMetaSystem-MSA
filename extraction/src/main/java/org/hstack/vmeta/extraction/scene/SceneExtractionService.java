@@ -1,5 +1,8 @@
 package org.hstack.vmeta.extraction.scene;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hstack.vmeta.extraction.basic.BasicDTO;
 import org.hstack.vmeta.extraction.scene.narrative.Narrative;
 import org.hstack.vmeta.extraction.scene.presentation.Presentation;
@@ -8,19 +11,24 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.Videoio;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.file.*;
 import java.sql.Time;
+import java.util.HashMap;
 import java.util.InputMismatchException;
+import java.util.Map;
 
 @Service
 public class SceneExtractionService implements Runnable {
 
 
-    private static final int CHANGE_DETECT_VALUE = 30;
+    private static final int CHANGE_DETECT_VALUE = 15;
 
     private String filePath;
     private SceneDTO sceneDTO;
@@ -51,20 +59,35 @@ public class SceneExtractionService implements Runnable {
      * @returnVal
      * - narrative, presentation
      */
-    private SceneDTO extractSceneDTO() {
+    public SceneDTO extractSceneDTO() {
 
         try {
 
-            extractFrameImage(filePath);        // 장면 추출
-            // TODO : judge narrative, presentation by using tensorflow
+            // 장면 추출
+            boolean succeed = extractFrameImage(filePath);
+            if (!succeed) {
+                throw new RuntimeException();
+            }
+
+            // 이미지 타입 결정
+            JsonNode imageTypeCnt = executeImageDetection(filePath);
+            int N = imageTypeCnt.findValue("N").intValue();
+            int L = imageTypeCnt.findValue("L").intValue();
+            int A = imageTypeCnt.findValue("A").intValue();
+            int P = imageTypeCnt.findValue("P").intValue();
 
             // return val
-            Narrative narrative;
-            Presentation presentation;
+            Narrative narrative = ( (N + L + P) / 3 > A )
+                    ? Narrative.DESCRIPTION
+                    : Narrative.APPLICATION;
+            Presentation presentation = ( (N + L) > (A + P) )
+                    ? Presentation.STATIC
+                    : Presentation.DYNAMIC;
 
-            return SceneDTO.builder()
-//                    .narrative(narrative)
-//                    .presentation(presentation)
+
+            return sceneDTO = SceneDTO.builder()
+                    .narrative(narrative)
+                    .presentation(presentation)
                     .build();
 
         } catch (InputMismatchException ie) {
@@ -73,13 +96,15 @@ public class SceneExtractionService implements Runnable {
         } catch (Exception e) {
             // TODO : Logging
             e.printStackTrace();
-        } finally {
-            return null;
         }
+
+        return sceneDTO = null;
     }
 
     /*
-     * 프레임 이미지 추출
+     * [extractFrameImage]
+     *  > 프레임 이미지 추출
+     *
      * @param
      * - filePath : 영상 파일 경로
      * @returnVal
@@ -142,8 +167,50 @@ public class SceneExtractionService implements Runnable {
         } catch (Exception e) {
             // TODO : logging
             e.printStackTrace();
-        } finally {
-            return false;
         }
+        return false;
+    }
+
+    /*
+     * [executeImageDetection]
+     *  > 추출된 이미지의 타입 결정 (FastAPI 연계)
+     *
+     * @param
+     * - filePath : 영상 파일 경로
+     * @returnVal
+     * - res : 결과 JSON
+     */
+    JsonNode executeImageDetection(String filePath) {
+        WebClient webClient = WebClient.builder()
+                .baseUrl("http://127.0.0.1:9001")
+                .build();
+
+        Map<String, String> jsonData = new HashMap<>();
+        jsonData.put("data", "E:\\test\\frames");
+
+        JsonNode res = webClient.post()
+                .uri("/imageDetection")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(jsonData))
+                .retrieve()
+                .bodyToMono(String.class)
+                .map(s -> {
+                    ObjectMapper mapper = new ObjectMapper();
+                    try {
+                        JsonNode jsonNode = mapper.readTree(s);
+                        return jsonNode;
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                })
+                .block();
+
+        // TODO : logging
+//        System.out.println(res.findValue("N")); // NEWS
+//        System.out.println(res.findValue("L")); // LECTURE
+//        System.out.println(res.findValue("A")); // APPLICATION
+//        System.out.println(res.findValue("P")); // PRESENTATION
+        return res;
     }
 }

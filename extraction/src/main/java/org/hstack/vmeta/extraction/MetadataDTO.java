@@ -31,11 +31,11 @@ public class MetadataDTO {
 
     private VideoFrame videoFrame;
 
-    private List<Category> category;
+    //private List<Category> category;
 
     private List<AudioDTO.Script> script;
 
     private List<KeywordDTO.Keyword> keyword;
 
-    private List<IndexScript> indexScript;
+    //private List<IndexScript> indexScript;
 }

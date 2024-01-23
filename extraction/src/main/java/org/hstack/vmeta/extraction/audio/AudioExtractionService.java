@@ -74,15 +74,16 @@ public class AudioExtractionService implements Runnable {
             FileUtils.cleanDirectory(audioDir);
             audioDir.delete();
             
-            return AudioDTO.builder()
+            return audioDTO = AudioDTO.builder()
                     .script(script)
                     .build();
 
         } catch (Exception e) {
             // TODO : Logging
             e.printStackTrace();
-            return null;
         }
+
+        return audioDTO = null;
     }
 
 
