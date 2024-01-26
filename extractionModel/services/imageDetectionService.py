@@ -20,8 +20,9 @@ import os
 
 EXT_LIST = ['.png', '.jpg']
 
+##--------------------------------------------------------- 
 ## [ extractImageType ]
-##  - dirPath 밑에 있는 이미지를 분석한다..
+##  - dirPath 밑에 있는 이미지를 분석한다.
 ## 
 ## @param
 ##  - dirPath
@@ -29,8 +30,8 @@ EXT_LIST = ['.png', '.jpg']
 ## 
 ## @return
 ##  - imageTypeCnt
-# #   : 각 type별 이미지의 개수를 저장한 값
-##
+##    : 각 type별 이미지의 개수를 저장한 값
+##--------------------------------------------------------- 
 def extractImageType(dirPath):
     imageModel.executeModel(dirPath)
     imageDir = os.listdir(dirPath)

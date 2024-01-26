@@ -3,7 +3,6 @@ package org.hstack.vmeta.extraction.scene;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hstack.vmeta.extraction.basic.BasicDTO;
 import org.hstack.vmeta.extraction.scene.narrative.Narrative;
 import org.hstack.vmeta.extraction.scene.presentation.Presentation;
 import org.opencv.core.Core;
@@ -11,15 +10,14 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.Videoio;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.nio.file.*;
-import java.sql.Time;
 import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.Map;
@@ -28,10 +26,17 @@ import java.util.Map;
 public class SceneExtractionService implements Runnable {
 
 
-    private static final int CHANGE_DETECT_VALUE = 15;
+    private static final int CHANGE_DETECT_VALUE = 40;
 
     private String filePath;
     private SceneDTO sceneDTO;
+
+    @Value("${fastapi.ip}")
+    private String API_IP;
+
+    @Value("{fastapi.port}")
+    private String API_PORT;
+
 
     /*
      * getter, setter
@@ -129,30 +134,31 @@ public class SceneExtractionService implements Runnable {
             int height = (int) videoCapture.get(Videoio.CAP_PROP_FRAME_HEIGHT);
 
             long frameSec = 0;
-            Mat pframe = new Mat(width, height, CvType.CV_8UC3);     // prev frame
-            Mat cframe = new Mat(width, height, CvType.CV_8UC3);     // curr frame
+            Mat pframe = new Mat(height, width, CvType.CV_8UC3);     // prev frame
+            Mat cframe = new Mat(height, width, CvType.CV_8UC3);     // curr frame
 
             while(true) {
+
                 videoCapture.read(cframe);  // 영상에서 프레임 하나를 읽어 frame에 저장
 
                 if (cframe.empty() || pframe.empty()) { // 1. 만약 더 이상 불러올 프레임이 없는 경우
                     break;                              // 종료
                 } else if (frameSec == 0) {             // 2. 첫 프레임인 경우
                     OpencvCalculator.saveImage(cframe, dirPath, 0);     // 해당 이미지 저장
-                } else if (frameSec % fps == 0) {       // 3. 그 외의 경우 : 1초마다
+                    cframe.copyTo(pframe);  // curr frame 과거 처리
+                } else {                                // 3. 그 외의 경우 : 프레임비교
                     double psnr = OpencvCalculator.getPSNR(pframe, cframe);
+                    System.out.println(frameSec + " : " + psnr);
                     if (0 < psnr && psnr < CHANGE_DETECT_VALUE) {               // psnr이 기준 이하이면
                         OpencvCalculator.saveImage(cframe, dirPath, frameSec);  // 해당 이미지 저장
+                        cframe.copyTo(pframe);                                  // curr frame 과거 처리
                     }
                 }
 
-                pframe = cframe;                    // curr frame 과거 처리
-                frameSec++;                         // 프레임번호 추가
+                frameSec++;             // 프레임번호 추가
 
-                // 시간 단축을 위해 fps만큼의 프레임을 미리 읽는다.
-                Mat m = new Mat();
-                for (int i = 0; i < fps; i++) {
-                    videoCapture.read(m);
+                for (int i = 0; i < fps - 1; i++) {
+                    videoCapture.read(cframe);
                 }
             }
 
@@ -182,11 +188,11 @@ public class SceneExtractionService implements Runnable {
      */
     JsonNode executeImageDetection(String filePath) {
         WebClient webClient = WebClient.builder()
-                .baseUrl("http://127.0.0.1:9001")
+                .baseUrl("http://" + API_IP + ":" + API_PORT)
                 .build();
 
         Map<String, String> jsonData = new HashMap<>();
-        jsonData.put("data", "E:\\test\\frames");
+        jsonData.put("data", filePath);
 
         JsonNode res = webClient.post()
                 .uri("/imageDetection")

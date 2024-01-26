@@ -14,6 +14,7 @@ from krwordrank.word import summarize_with_keywords
 from krwordrank.hangle import normalize
 
 
+##--------------------------------------------------------- 
 ## [ extractKeyword ]
 ##  - 키워드를 추출한다.
 ## 
@@ -24,7 +25,7 @@ from krwordrank.hangle import normalize
 ## @return
 ##  - predKeyword
 ##    : 정제된 키워드를 확률과 함께 매핑한 딕셔너리
-##
+##--------------------------------------------------------- 
 def extractKeyword(script):   
 
     if (script is None) :
@@ -65,6 +66,7 @@ def extractKeyword(script):
     return predKeyword
 
 
+##--------------------------------------------------------- 
 ## [ postProcessing ]
 ##  - 추출된 Keyword를 후처리한다.
 ## 
@@ -75,7 +77,7 @@ def extractKeyword(script):
 ## @return
 ##  - predKeyword
 ##    : 정제된 키워드를 확률과 함께 매핑한 딕셔너리
-##
+##--------------------------------------------------------- 
 def postProcessing(extractedKeyword):
 
     okt = Okt()

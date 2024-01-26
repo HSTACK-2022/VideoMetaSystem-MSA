@@ -31,6 +31,8 @@ EXT_LIST = ['.png', '.jpg']
 MODEL_NAME = "imageModel.h5"
 MODEL_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), MODEL_NAME)
 
+
+##--------------------------------------------------------- 
 ## [ executeModel ]
 ##  - dirPath 밑에 있는 이미지를 분석한다.
 ## 
@@ -40,7 +42,7 @@ MODEL_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), MODEL_NAM
 ## 
 ## @return
 ##  - none.
-##
+##--------------------------------------------------------- 
 def executeModel(dirPath):
 
     # 모델 실행을 위한 매개변수 준비
@@ -57,6 +59,7 @@ def executeModel(dirPath):
                 os.rename(absFilePath, os.path.join(dirPath, newFileName))
 
 
+##--------------------------------------------------------- 
 ## [ createModel ]
 ##  - train을 위한 모델 정보를 생성한다.
 ## 
@@ -65,7 +68,7 @@ def executeModel(dirPath):
 ## 
 ## @return
 ##  - none.
-##
+##--------------------------------------------------------- 
 def createModel():
     model = tf.keras.models.Sequential([
         tf.keras.layers.Conv2D(16, (3, 3), activation='relu', input_shape=(150, 150, 3)),
@@ -83,6 +86,7 @@ def createModel():
                 metrics=['accuracy'])
     return model
 
+##--------------------------------------------------------- 
 ## [ train ]
 ##  - train, validation 폴더 밑의 정보를 기반으로 모델을 생성한다.
 ## 
@@ -91,7 +95,7 @@ def createModel():
 ## 
 ## @return
 ##  - none.
-##
+##--------------------------------------------------------- 
 def train():
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     TRAIN_DIR = os.path.join(BASE_DIR, 'train')
