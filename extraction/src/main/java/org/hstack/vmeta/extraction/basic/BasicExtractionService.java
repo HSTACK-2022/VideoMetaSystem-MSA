@@ -47,7 +47,7 @@ public class BasicExtractionService implements Runnable {
      * @returnVal
      * - length, videoSize, videoType(ext), videoFrame(fps)
      */
-    private void extractBasicDTO() {
+    private BasicDTO extractBasicDTO() {
 
         try {
             // return val
@@ -82,14 +82,12 @@ public class BasicExtractionService implements Runnable {
                 throw new InputMismatchException();
             }
 
-            basicDTO = BasicDTO.builder()
+            return basicDTO = BasicDTO.builder()
                     .length(length)
                     .videoSize(videoSize)
                     .videoType(videoType)
                     .videoFrame(videoFrame)
                     .build();
-
-            return;
 
         } catch(FileNotFoundException fe) {
             // TODO : Logging
@@ -102,7 +100,7 @@ public class BasicExtractionService implements Runnable {
             e.printStackTrace();
         }
 
-        basicDTO = null;
+        return basicDTO = null;
     }
     
 }

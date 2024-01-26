@@ -1,6 +1,8 @@
 package org.hstack.vmeta.extraction.scene;
 
-import org.hstack.vmeta.extraction.basic.BasicDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hstack.vmeta.extraction.scene.narrative.Narrative;
 import org.hstack.vmeta.extraction.scene.presentation.Presentation;
 import org.opencv.core.Core;
@@ -8,22 +10,33 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.Videoio;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.nio.file.*;
-import java.sql.Time;
+import java.util.HashMap;
 import java.util.InputMismatchException;
+import java.util.Map;
 
 @Service
 public class SceneExtractionService implements Runnable {
 
 
-    private static final int CHANGE_DETECT_VALUE = 30;
+    private static final int CHANGE_DETECT_VALUE = 40;
 
     private String filePath;
     private SceneDTO sceneDTO;
+
+    @Value("${fastapi.ip}")
+    private String API_IP;
+
+    @Value("{fastapi.port}")
+    private String API_PORT;
+
 
     /*
      * getter, setter
@@ -51,20 +64,35 @@ public class SceneExtractionService implements Runnable {
      * @returnVal
      * - narrative, presentation
      */
-    private SceneDTO extractSceneDTO() {
+    public SceneDTO extractSceneDTO() {
 
         try {
 
-            extractFrameImage(filePath);        // 장면 추출
-            // TODO : judge narrative, presentation by using tensorflow
+            // 장면 추출
+            boolean succeed = extractFrameImage(filePath);
+            if (!succeed) {
+                throw new RuntimeException();
+            }
+
+            // 이미지 타입 결정
+            JsonNode imageTypeCnt = executeImageDetection(filePath);
+            int N = imageTypeCnt.findValue("N").intValue();
+            int L = imageTypeCnt.findValue("L").intValue();
+            int A = imageTypeCnt.findValue("A").intValue();
+            int P = imageTypeCnt.findValue("P").intValue();
 
             // return val
-            Narrative narrative;
-            Presentation presentation;
+            Narrative narrative = ( (N + L + P) / 3 > A )
+                    ? Narrative.DESCRIPTION
+                    : Narrative.APPLICATION;
+            Presentation presentation = ( (N + L) > (A + P) )
+                    ? Presentation.STATIC
+                    : Presentation.DYNAMIC;
 
-            return SceneDTO.builder()
-//                    .narrative(narrative)
-//                    .presentation(presentation)
+
+            return sceneDTO = SceneDTO.builder()
+                    .narrative(narrative)
+                    .presentation(presentation)
                     .build();
 
         } catch (InputMismatchException ie) {
@@ -73,13 +101,15 @@ public class SceneExtractionService implements Runnable {
         } catch (Exception e) {
             // TODO : Logging
             e.printStackTrace();
-        } finally {
-            return null;
         }
+
+        return sceneDTO = null;
     }
 
     /*
-     * 프레임 이미지 추출
+     * [extractFrameImage]
+     *  > 프레임 이미지 추출
+     *
      * @param
      * - filePath : 영상 파일 경로
      * @returnVal
@@ -104,30 +134,31 @@ public class SceneExtractionService implements Runnable {
             int height = (int) videoCapture.get(Videoio.CAP_PROP_FRAME_HEIGHT);
 
             long frameSec = 0;
-            Mat pframe = new Mat(width, height, CvType.CV_8UC3);     // prev frame
-            Mat cframe = new Mat(width, height, CvType.CV_8UC3);     // curr frame
+            Mat pframe = new Mat(height, width, CvType.CV_8UC3);     // prev frame
+            Mat cframe = new Mat(height, width, CvType.CV_8UC3);     // curr frame
 
             while(true) {
+
                 videoCapture.read(cframe);  // 영상에서 프레임 하나를 읽어 frame에 저장
 
                 if (cframe.empty() || pframe.empty()) { // 1. 만약 더 이상 불러올 프레임이 없는 경우
                     break;                              // 종료
                 } else if (frameSec == 0) {             // 2. 첫 프레임인 경우
                     OpencvCalculator.saveImage(cframe, dirPath, 0);     // 해당 이미지 저장
-                } else if (frameSec % fps == 0) {       // 3. 그 외의 경우 : 1초마다
+                    cframe.copyTo(pframe);  // curr frame 과거 처리
+                } else {                                // 3. 그 외의 경우 : 프레임비교
                     double psnr = OpencvCalculator.getPSNR(pframe, cframe);
+                    System.out.println(frameSec + " : " + psnr);
                     if (0 < psnr && psnr < CHANGE_DETECT_VALUE) {               // psnr이 기준 이하이면
                         OpencvCalculator.saveImage(cframe, dirPath, frameSec);  // 해당 이미지 저장
+                        cframe.copyTo(pframe);                                  // curr frame 과거 처리
                     }
                 }
 
-                pframe = cframe;                    // curr frame 과거 처리
-                frameSec++;                         // 프레임번호 추가
+                frameSec++;             // 프레임번호 추가
 
-                // 시간 단축을 위해 fps만큼의 프레임을 미리 읽는다.
-                Mat m = new Mat();
-                for (int i = 0; i < fps; i++) {
-                    videoCapture.read(m);
+                for (int i = 0; i < fps - 1; i++) {
+                    videoCapture.read(cframe);
                 }
             }
 
@@ -142,8 +173,50 @@ public class SceneExtractionService implements Runnable {
         } catch (Exception e) {
             // TODO : logging
             e.printStackTrace();
-        } finally {
-            return false;
         }
+        return false;
+    }
+
+    /*
+     * [executeImageDetection]
+     *  > 추출된 이미지의 타입 결정 (FastAPI 연계)
+     *
+     * @param
+     * - filePath : 영상 파일 경로
+     * @returnVal
+     * - res : 결과 JSON
+     */
+    JsonNode executeImageDetection(String filePath) {
+        WebClient webClient = WebClient.builder()
+                .baseUrl("http://" + API_IP + ":" + API_PORT)
+                .build();
+
+        Map<String, String> jsonData = new HashMap<>();
+        jsonData.put("data", filePath);
+
+        JsonNode res = webClient.post()
+                .uri("/imageDetection")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue(jsonData))
+                .retrieve()
+                .bodyToMono(String.class)
+                .map(s -> {
+                    ObjectMapper mapper = new ObjectMapper();
+                    try {
+                        JsonNode jsonNode = mapper.readTree(s);
+                        return jsonNode;
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                })
+                .block();
+
+        // TODO : logging
+//        System.out.println(res.findValue("N")); // NEWS
+//        System.out.println(res.findValue("L")); // LECTURE
+//        System.out.println(res.findValue("A")); // APPLICATION
+//        System.out.println(res.findValue("P")); // PRESENTATION
+        return res;
     }
 }

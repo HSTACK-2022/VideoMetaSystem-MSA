@@ -16,6 +16,7 @@ public class AudioDTO {
 
     private List<Script> script;
 
+    @Getter
     @Builder
     public static class Script {
 

@@ -13,7 +13,7 @@ public class KeywordCalculator {
 
     public List<KeywordDTO.Keyword> getKeywordList(String filePath) {
 
-        List<KeywordDTO.Keyword> keywordList;
+        List<KeywordDTO.Keyword> keywordList = null;
 
         return keywordList;
     }

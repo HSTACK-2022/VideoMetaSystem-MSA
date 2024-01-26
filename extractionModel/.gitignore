@@ -1,3 +1,10 @@
 venv
+
 __pycache__
+routers/__pycache__
+services/__pycache__
+
 config.ini
+
+imageModel/train
+imageModel/validation
