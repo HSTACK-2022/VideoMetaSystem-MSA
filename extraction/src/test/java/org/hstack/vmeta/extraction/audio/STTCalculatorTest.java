@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 class STTCalculatorTest {
 
-
     @Value("${etri.keys}")
     private String[] ETRI_API_KEY;
 

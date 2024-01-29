@@ -18,7 +18,6 @@ import java.util.Map;
 @Service
 public class KeywordExtractionService {
 
-
     @Value("${fastapi.ip}")
     private String API_IP;
 
@@ -27,11 +26,12 @@ public class KeywordExtractionService {
 
 
     /*
-     * 음성 정보 추출
+     * [extractKeywordDTO]
+     *  > audioDTO를 기반으로 KeywordDTO 추출
      * @param
-     * - filePath : 영상 파일 경로
+     * - audioDTO : 스크립트가 저장된 audioDTO
      * @returnVal
-     * - script
+     * - KeywordDTO : List<keyword>
      */
     public KeywordDTO extractKeywordDTO(AudioDTO audioDTO) {
         try {

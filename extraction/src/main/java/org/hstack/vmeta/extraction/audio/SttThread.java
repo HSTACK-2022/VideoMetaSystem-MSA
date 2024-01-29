@@ -3,7 +3,6 @@ package org.hstack.vmeta.extraction.audio;
 import com.google.gson.Gson;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.io.DataOutputStream;
 import java.io.File;
