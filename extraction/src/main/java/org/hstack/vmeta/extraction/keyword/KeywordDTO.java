@@ -15,6 +15,7 @@ public class KeywordDTO {
 
     private List<Keyword> keyword;
 
+    @Getter
     @Builder
     public static class Keyword {
         Long id;

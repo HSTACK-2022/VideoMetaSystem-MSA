@@ -19,6 +19,11 @@ public class SttCalculator {
     @Value("${etri.keys}")
     private String[] ETRI_API_KEY;
 
+    @Value("${etri.url}")
+    private String ETRI_STT_API_URL;
+
+    private static final String ETRI_STT_API_SUB_URL= "/Recognition";
+
     /*
      * filePath에 해당하는 비디오 파일에 대해 SttThread를 호출한다.
      * @param
@@ -35,7 +40,7 @@ public class SttCalculator {
             // Key의 개수만큼 스레드 생성 및 초기화
             SttThread[] sttThreads = new SttThread[keySize];
             for (int i = 0; i < keySize; i++) {
-                sttThreads[i] = new SttThread(ETRI_API_KEY[i]);
+                sttThreads[i] = new SttThread(ETRI_API_KEY[i], ETRI_STT_API_URL+ETRI_STT_API_SUB_URL);
             }
 
             // filePath에서 audioDir 경로 얻기

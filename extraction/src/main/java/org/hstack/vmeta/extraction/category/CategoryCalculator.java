@@ -1,9 +1,6 @@
 package org.hstack.vmeta.extraction.category;
 
 import com.google.gson.Gson;
-import net.minidev.json.JSONObject;
-import net.minidev.json.parser.JSONParser;
-import org.hstack.vmeta.extraction.keyword.KeywordDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -11,9 +8,6 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 @Component
@@ -55,8 +49,7 @@ public class CategoryCalculator {
         // send req to STT Server
         try {
             // repeat for ETRI Key length
-            // repeat for ETRI Key length
-            for (int i = 0; i < 1; i++) {
+            for (int i = 0; i < ETRI_API_KEY.length; i++) {
 
                 // set connection
                 URL url = new URL(ETRI_STT_API_URL + ETRI_STT_API_SUB_URL);
@@ -85,6 +78,9 @@ public class CategoryCalculator {
                     sb.append(inputLine);
                 }
                 responseBodyJson = sb.toString();
+
+                // TODO : logging
+                System.out.println("[" + responseCode + "]" + responseBodyJson);
 
                 // response storing
                 if (responseCode == 200) {
@@ -125,6 +121,12 @@ public class CategoryCalculator {
         Map<String, Float> morphemesMap = new HashMap<>(); // 결과 저장용 HashMap
 
         for (int i = 0; i < res.length; i++) {
+
+            // responseBody가 null인 경우 로직 진행 X
+            if (res[i] == null) {
+                continue;
+            }
+
             Map<String, Object> responseBody = new Gson().fromJson(res[i], Map.class);
             Map<String, Object> returnObject = (Map<String, Object>) responseBody.get("return_object");
             List<Map> sentences = (List<Map>) returnObject.get("sentence");
