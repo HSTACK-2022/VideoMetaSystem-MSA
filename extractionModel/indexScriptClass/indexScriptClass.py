@@ -19,7 +19,6 @@ import re
 from unittest import result
 import networkx
 
-from . import calTime
 from datetime import datetime
  
 class RawSentence:

@@ -10,8 +10,11 @@ from services import indexScriptService
 class ImageJsonData(BaseModel):
     data: str = None
 
-class LanguageJsonData(BaseModel):
+class KeywordJsonData(BaseModel):
     data: list = {}
+
+class IndexScriptJsonData(BaseModel):
+    data: dict = {}
 
 
 # router 선언
@@ -24,11 +27,11 @@ def getImageType(jsonData : ImageJsonData):
     return imageDetectionService.extractImageType(jsonDict['data'])
 
 @router.post("/keyword", tags=['keyword'])
-def getKeyword(jsonData : LanguageJsonData):
+def getKeyword(jsonData : KeywordJsonData):
     jsonDict = jsonData.dict()
     return keywordService.extractKeyword(jsonDict['data'])
 
-@router.post("/indexScriptList", tags=['keyword'])
-def getKeyword(jsonData : LanguageJsonData):
+@router.post("/indexScript", tags=['indexScript'])
+def getKeyword(jsonData : IndexScriptJsonData):
     jsonDict = jsonData.dict()
     return indexScriptService.extractIndexScript(jsonDict['data'])

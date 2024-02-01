@@ -40,7 +40,7 @@ def getHashString():
 ## 
 ## @param
 ##  - scriptDict
-##    : 문장 리스트 ({time, content}의 리스트 형태)
+##    : 문장 리스트 ({time, content}의 Dict 형태)
 ## 
 ## @return
 ##  - resultDict
@@ -63,7 +63,7 @@ def extractIndexScript(scriptDict):
 ## @param
 ##  - scriptDict
 ##    : 영상에서 추출한 음성의 텍스트화.
-#       {time, content}의 List 형태
+#       {time, content}의 Dict 형태
 ## 
 ## @return
 ##  - textFilePath
@@ -76,8 +76,8 @@ def scriptDict2TextFile(scriptDict):
     textFile = open(fileName, "w+", encoding='UTF-8-sig')
 
     # scriptDict 읽어오기
-    for script in scriptDict:
-        textFile.write(script['content'])
+    for time, content in scriptDict.items():
+        textFile.write(content)
         textFile.write('\n')
 
     textFile.close()
@@ -139,7 +139,7 @@ def getIndexSentence(textFilePath):
 ## @param
 ##  - scriptDict
 ##    : 영상에서 추출한 음성의 텍스트화.
-#       {time, content}의 List 형태
+#       {time, content}의 Dict 형태
 ##  - resultList
 ##    : 추출된 주요 문장 리스트
 ## 
@@ -148,15 +148,15 @@ def getIndexSentence(textFilePath):
 ##    : scriptDict과 resultList의 교집합 리스트
 ##--------------------------------------------------------- 
 def filterIndexSentence(scriptDict, resultList):
-    indexScriptDict = list()
+    indexScriptDict = dict()
     scriptDictLength = len(scriptDict)
-    scriptDictOffset = 0
+
+    scriptDictReverse = {v:k for k, v in scriptDict.items()}    # content로 time을 찾기 위함
+
     for resultIndexScript in resultList:
-        for i in range(scriptDictOffset, scriptDictLength):
-            if (scriptDict[i]['content'] == resultIndexScript):
-                indexScriptDict.append(scriptDict[i])
-                scriptDictOffset = i + 1
-                break
+        time = scriptDictReverse.get(resultIndexScript)
+        if time is not None:
+            indexScriptDict[time] = resultIndexScript
 
     return indexScriptDict
     
@@ -169,23 +169,23 @@ def filterIndexSentence(scriptDict, resultList):
 if __name__ == '__main__' :
     
     ## TESTCASE
-    script = [
-        {'time' : '00:00:00',   'content' : '계절이 지나가는 하늘에는'}
-        , {'time' : '00:00:10',   'content' : '가을로 가득 차 있습니다.'}
-        , {'time' : '00:00:20',   'content' : '나는 아무 걱정도 없이'}
-        , {'time' : '00:00:30',   'content' : '가을 속의 별들을 다 헤일 듯합니다.'}
-        , {'time' : '00:00:40',   'content' : '가슴속에 하나둘 새겨지는 별을'}
-        , {'time' : '00:00:50',   'content' : '이제 다 못 헤는 것은'}
-        , {'time' : '00:01:00',   'content' : '쉬이 아침이 오는 까닭이요'}
-        , {'time' : '00:01:10',   'content' : '내일 밤이 남은 까닭이요'}
-        , {'time' : '00:01:20',   'content' : '아직 나의 청춘이 다하지 않은 까닭입니다'}
-        , {'time' : '00:01:30',   'content' : '별 하나에 추억과'}
-        , {'time' : '00:01:40',   'content' : '별 하나에 사랑과'}
-        , {'time' : '00:01:50',   'content' : '별 하나에 쓸쓸함과'}
-        , {'time' : '00:02:00',   'content' : '별 하나에 동경과'}
-        , {'time' : '00:02:10',   'content' : '별 하나에 시와'}
-        , {'time' : '00:02:20',   'content' : '별 하나에 어머니 어머니'}
-    ]
+    script = {
+        '00:00:00' : '계절이 지나가는 하늘에는'
+        , '00:00:10' : '가을로 가득 차 있습니다.'
+        , '00:00:20' : '나는 아무 걱정도 없이'
+        , '00:00:30' : '가을 속의 별들을 다 헤일 듯합니다.'
+        , '00:00:40' : '가슴속에 하나둘 새겨지는 별을'
+        , '00:00:50' : '이제 다 못 헤는 것은'
+        , '00:01:00' : '쉬이 아침이 오는 까닭이요'
+        , '00:01:10' : '내일 밤이 남은 까닭이요'
+        , '00:01:20' : '아직 나의 청춘이 다하지 않은 까닭입니다'
+        , '00:01:30' : '별 하나에 추억과'
+        , '00:01:40' : '별 하나에 사랑과'
+        , '00:01:50' : '별 하나에 쓸쓸함과'
+        , '00:02:00' : '별 하나에 동경과'
+        , '00:02:10' : '별 하나에 시와'
+        , '00:02:20' : '별 하나에 어머니 어머니'
+    }
 
     extractIndexScript(script)
     
