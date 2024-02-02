@@ -4,6 +4,9 @@ import org.hstack.vmeta.extraction.audio.AudioDTO;
 import org.hstack.vmeta.extraction.audio.AudioExtractionService;
 import org.hstack.vmeta.extraction.basic.BasicDTO;
 import org.hstack.vmeta.extraction.basic.BasicExtractionService;
+import org.hstack.vmeta.extraction.category.CategoryDTO;
+import org.hstack.vmeta.extraction.category.CategoryExtractionService;
+import org.hstack.vmeta.extraction.keyword.KeywordDTO;
 import org.hstack.vmeta.extraction.keyword.KeywordExtractionService;
 import org.hstack.vmeta.extraction.scene.SceneDTO;
 import org.hstack.vmeta.extraction.scene.SceneExtractionService;
@@ -29,8 +32,14 @@ public class ExtractionService {
     @Autowired
     private KeywordExtractionService keywordExtractionService;
 
+    @Autowired
+    private CategoryExtractionService categoryExtractionService;
+
     public MetadataDTO extractMetadataDTO(Long id, String filePath) {
         try {
+
+            // TODO : title 받아오기
+            String title = "";
 
             // 파일 경로로 각 서비스 초기화
             basicExtractionService.init(filePath);
@@ -50,6 +59,10 @@ public class ExtractionService {
             AudioDTO audioDTO = audioExtractionService.getResult();
             SceneDTO sceneDTO = sceneExtractionService.getResult();
 
+            // 키워드, 카테고리, 스크립트 순차 진행
+            KeywordDTO keywordDTO = keywordExtractionService.extractKeywordDTO(audioDTO);
+            CategoryDTO categoryDTO = categoryExtractionService.extractCategoryDTO(keywordDTO, title);
+
 
             return MetadataDTO.builder()
                     .id(id)
@@ -60,7 +73,7 @@ public class ExtractionService {
                     .script(audioDTO.getScript())
                     .narrative(sceneDTO.getNarrative())
                     .presentation(sceneDTO.getPresentation())
-//                    .keyword(keywordDTO.getKeyword())
+                    .keyword(keywordDTO.getKeyword())
 //                    .indexScript(indexScriptDTO.getIndexScript())
 //                    .category(categoryDTO.getCategory())
                     .build();

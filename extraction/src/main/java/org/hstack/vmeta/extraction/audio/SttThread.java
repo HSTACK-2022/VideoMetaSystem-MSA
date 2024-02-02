@@ -3,7 +3,6 @@ package org.hstack.vmeta.extraction.audio;
 import com.google.gson.Gson;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -21,7 +20,7 @@ class SttThread extends Thread {
 
     private String apiKey;
 
-    private static final String ETRI_STT_API_URL = "http://aiopen.etri.re.kr:8000/WiseASR/Recognition";
+    private String sttApiUrl;
 
     private static final String LANGUAGE_CODE = "korean";     // 언어 코드
 
@@ -38,8 +37,9 @@ class SttThread extends Thread {
      * @returnVal
      * - script str
      */
-    public SttThread(String apiKey) {
+    public SttThread(String apiKey, String sttApiUrl) {
         this.apiKey = apiKey;
+        this.sttApiUrl = sttApiUrl;
         scriptMap = new TreeMap<>();
         filePathStack = new Stack<>();
     }
@@ -115,7 +115,7 @@ class SttThread extends Thread {
             sleep((long) (100L*filePathStack.size()*Math.random()));
 
             // set connection
-            URL url = new URL(ETRI_STT_API_URL);
+            URL url = new URL(sttApiUrl);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);

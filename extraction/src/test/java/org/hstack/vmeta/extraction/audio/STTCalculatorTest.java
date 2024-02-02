@@ -19,9 +19,13 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 class STTCalculatorTest {
 
-
     @Value("${etri.keys}")
     private String[] ETRI_API_KEY;
+
+    @Value("${etri.url}")
+    private String ETRI_STT_API_URL;
+
+    private static final String ETRI_STT_API_SUB_URL= "/Recognition";
 
     private static final String filePath = "E:\\test\\WEEK4_01.mp4";
 
@@ -38,7 +42,7 @@ class STTCalculatorTest {
             // Key의 개수만큼 스레드 생성 및 초기화
             SttThread[] sttThreads = new SttThread[keySize];
             for (int i = 0; i < keySize; i++) {
-                sttThreads[i] = new SttThread(ETRI_API_KEY[i]);
+                sttThreads[i] = new SttThread(ETRI_API_KEY[i], ETRI_STT_API_URL+ETRI_STT_API_SUB_URL);
             }
 
             // filePath에서 audioDir 경로 얻기

@@ -1,4 +1,4 @@
-package org.hstack.vmeta.extraction.keyword;
+package org.hstack.vmeta.extraction.category;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,17 +11,14 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class KeywordDTO {
+public class CategoryDTO {
 
-    private List<Keyword> keyword;
+    private List<CategoryDTO.Category> category;
 
-    @Getter
     @Builder
-    public static class Keyword {
+    public static class Category {
         Long id;
-        String keyword;
+        String categoryType;
         float perc;
-        boolean expose;
-        boolean autocreated;
     }
 }

@@ -1,4 +1,4 @@
-package org.hstack.vmeta.extraction.keyword;
+package org.hstack.vmeta.extraction.indexScript;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -10,13 +10,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
-public class KeywordExtractionService {
+public class IndexScriptExtractionService {
 
     @Value("${fastapi.ip}")
     private String API_IP;
@@ -24,28 +25,27 @@ public class KeywordExtractionService {
     @Value("${fastapi.port}")
     private String API_PORT;
 
-
     /*
-     * [extractKeywordDTO]
+     * [extractIndexScriptDTO]
      *  > audioDTO를 기반으로 KeywordDTO 추출
      * @param
      * - audioDTO : 스크립트가 저장된 audioDTO
      * @returnVal
      * - KeywordDTO : List<keyword>
      */
-    public KeywordDTO extractKeywordDTO(AudioDTO audioDTO) {
+    public IndexScriptDTO extractIndexScriptDTO(AudioDTO audioDTO) {
         try {
             // script -> string list로 변환
-            List<String> scriptList = script2StringList(audioDTO);
+            Map<String, String> scriptMap = script2StringMap(audioDTO);
 
             // 키워드 목록 얻기
-            Map<String, Float> keywordMap = executeKeywordApi(scriptList);
+            Map<String, String> indexScriptMap = executeIndexScriptApi(scriptMap);
 
-            // Map -> keyword list로 변환
-            List<KeywordDTO.Keyword> keyword = keywordMap2List(keywordMap);
+            // Map -> indexScript list로 변환
+            List<IndexScriptDTO.IndexScript> indexScript = indexScriptMap2List(indexScriptMap);
 
-            return KeywordDTO.builder()
-                    .keyword(keyword)
+            return IndexScriptDTO.builder()
+                    .indexScript(indexScript)
                     .build();
 
         } catch (Exception e) {
@@ -65,58 +65,58 @@ public class KeywordExtractionService {
      * @returnVal
      * - scriptList : 변환된 List<String>
      */
-    List<String> script2StringList(AudioDTO audioDTO) {
-        List<String> scriptList = new ArrayList<>();
+    Map<String, String> script2StringMap(AudioDTO audioDTO) {
+        Map<String, String> scriptMap = new HashMap<>();
         for (AudioDTO.Script s : audioDTO.getScript()) {
-            scriptList.add(s.getContent());
+            scriptMap.put(s.getTime().toString(), s.getContent());
         }
-        return scriptList;
+        return scriptMap;
     }
 
 
     /*
-     * [keywordMap2List]
-     *  > keywordMap을 List로 변환
+     * [indexScriptMap2List]
+     *  > indexScriptMap을 List로 변환
      *
      * @param
-     * - keywordMap : API로 받은 결과값
+     * - indexScriptMap : API로 받은 결과값
      * @returnVal
-     * - keywordList : 변환된 List<Keyword>
+     * - indexScriptList : 변환된 List<IndexScript>
      */
-    List<KeywordDTO.Keyword> keywordMap2List(Map<String, Float> keywordMap) {
-        List<KeywordDTO.Keyword> keywordList = new ArrayList<>();
-        for (String key : keywordMap.keySet()) {
-            keywordList.add(KeywordDTO.Keyword
+    List<IndexScriptDTO.IndexScript> indexScriptMap2List(Map<String, String> indexScriptMap) {
+        List<IndexScriptDTO.IndexScript> indexScriptList = new ArrayList<>();
+        for (String key : indexScriptMap.keySet()) {
+            indexScriptList.add(IndexScriptDTO.IndexScript
                     .builder()
-                    .keyword(key)
-                    .perc(Float.parseFloat(keywordMap.get(key)+""))
+                    .time(Time.valueOf(key))
+                    .content(indexScriptMap.get(key))
                     .autocreated(true)
                     .expose(true)
                     .build());
         }
-        return keywordList;
+        return indexScriptList;
     }
 
 
     /*
-     * [executeKeywordApi]
-     *  > 키워드 추출 (FastAPI 연계)
+     * [executeIndexScriptApi]
+     *  > 주요 문장 추출 (FastAPI 연계)
      *
      * @param
-     * - script : List<String>으로 변환된 문자열
+     * - script : List<Script>으로 변환된 문자열
      * @returnVal
      * - res : 결과 Map (Keyword, perc)
      */
-    Map<String, Float> executeKeywordApi(List<String> script) {
+    Map<String, String> executeIndexScriptApi(Map<String, String> scriptMap) {
         WebClient webClient = WebClient.builder()
                 .baseUrl("http://" + API_IP + ":" + API_PORT)
                 .build();
 
-        Map<String, List<String>> jsonData = new HashMap<>();
-        jsonData.put("data", script);
+        Map<String, Map<String, String>> jsonData = new HashMap<>();
+        jsonData.put("data", scriptMap);
 
-        Map<String, Float> res = webClient.post()
-                .uri("/keyword")
+        Map<String, String> res = webClient.post()
+                .uri("/indexScript")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(jsonData))
                 .retrieve()
@@ -125,7 +125,7 @@ public class KeywordExtractionService {
                     ObjectMapper mapper = new ObjectMapper();
                     try {
                         JsonNode jsonNode = mapper.readTree(s);
-                        Map<String, Float> keywordMap = mapper.treeToValue(jsonNode, Map.class);
+                        Map<String, String> keywordMap = mapper.treeToValue(jsonNode, Map.class);
                         return keywordMap;
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
