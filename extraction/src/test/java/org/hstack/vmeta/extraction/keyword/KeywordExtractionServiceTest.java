@@ -153,7 +153,8 @@ class KeywordExtractionServiceTest {
         // BeforeEach에서 audioDTO 생성 완료
 
         // when
-        KeywordDTO keywordDTO = keywordExtractionService.extractKeywordDTO(audioDTO);
+        keywordExtractionService.init(audioDTO);
+        KeywordDTO keywordDTO = keywordExtractionService.extractKeywordDTO();
 
         // then
         assertThat(keywordDTO).isNotNull();

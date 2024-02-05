@@ -99,7 +99,6 @@ public class FFmpegCalculator {
 
             // FFmpeg 실행
             executor.createJob(builder).run();
-            System.out.println(audioNum);
         }
     }
 }

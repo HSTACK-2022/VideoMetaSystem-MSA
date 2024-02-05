@@ -97,8 +97,7 @@ def scriptDict2TextFile(scriptDict):
 ##    : 추출된 주요 문장 리스트
 ##--------------------------------------------------------- 
 def getIndexSentence(textFilePath):
-    resultDic = {}
-
+    
     # TextRank 초기화
     tr = TextRank()
     tagger = Komoran()
@@ -149,10 +148,7 @@ def getIndexSentence(textFilePath):
 ##--------------------------------------------------------- 
 def filterIndexSentence(scriptDict, resultList):
     indexScriptDict = dict()
-    scriptDictLength = len(scriptDict)
-
     scriptDictReverse = {v:k for k, v in scriptDict.items()}    # content로 time을 찾기 위함
-
     for resultIndexScript in resultList:
         time = scriptDictReverse.get(resultIndexScript)
         if time is not None:

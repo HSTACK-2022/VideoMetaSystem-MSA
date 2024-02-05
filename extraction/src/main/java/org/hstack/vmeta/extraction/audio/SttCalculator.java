@@ -22,7 +22,7 @@ public class SttCalculator {
     @Value("${etri.url}")
     private String ETRI_STT_API_URL;
 
-    private static final String ETRI_STT_API_SUB_URL= "/Recognition";
+    private static final String ETRI_STT_API_SUB_URL= "/WiseASR/Recognition";
 
     /*
      * filePath에 해당하는 비디오 파일에 대해 SttThread를 호출한다.

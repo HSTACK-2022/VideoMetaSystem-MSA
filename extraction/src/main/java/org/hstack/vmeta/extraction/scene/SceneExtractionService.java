@@ -3,6 +3,7 @@ package org.hstack.vmeta.extraction.scene;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.FileUtils;
 import org.hstack.vmeta.extraction.scene.narrative.Narrative;
 import org.hstack.vmeta.extraction.scene.presentation.Presentation;
 import org.opencv.core.Core;
@@ -34,7 +35,7 @@ public class SceneExtractionService implements Runnable {
     @Value("${fastapi.ip}")
     private String API_IP;
 
-    @Value("{fastapi.port}")
+    @Value("${fastapi.port}")
     private String API_PORT;
 
 
@@ -67,15 +68,14 @@ public class SceneExtractionService implements Runnable {
     public SceneDTO extractSceneDTO() {
 
         try {
-
             // 장면 추출
-            boolean succeed = extractFrameImage(filePath);
-            if (!succeed) {
+            String dirPath = extractFrameImage(filePath);
+            if (dirPath == null) {
                 throw new RuntimeException();
             }
 
             // 이미지 타입 결정
-            JsonNode imageTypeCnt = executeImageDetection(filePath);
+            JsonNode imageTypeCnt = executeImageDetection(dirPath);
             int N = imageTypeCnt.findValue("N").intValue();
             int L = imageTypeCnt.findValue("L").intValue();
             int A = imageTypeCnt.findValue("A").intValue();
@@ -115,12 +115,18 @@ public class SceneExtractionService implements Runnable {
      * @returnVal
      * - flag : 성공 여부
      */
-    boolean extractFrameImage(String filePath) {
+    String extractFrameImage(String filePath) {
         try {
             // img 파일을 저장할 폴더 생성
             String dirPath = Paths.get(filePath).getParent().toString()
                     + File.separator
                     + "frames";
+
+            File frameDir = new File(dirPath);
+            if (frameDir.exists()) {                    // 이미 해당 폴더가 있으면
+                FileUtils.cleanDirectory(frameDir);     // 삭제 후 재생성
+                frameDir.delete();
+            }
             Files.createDirectory(Paths.get(dirPath));
 
             // videoCapture로 open
@@ -148,7 +154,6 @@ public class SceneExtractionService implements Runnable {
                     cframe.copyTo(pframe);  // curr frame 과거 처리
                 } else {                                // 3. 그 외의 경우 : 프레임비교
                     double psnr = OpencvCalculator.getPSNR(pframe, cframe);
-                    System.out.println(frameSec + " : " + psnr);
                     if (0 < psnr && psnr < CHANGE_DETECT_VALUE) {               // psnr이 기준 이하이면
                         OpencvCalculator.saveImage(cframe, dirPath, frameSec);  // 해당 이미지 저장
                         cframe.copyTo(pframe);                                  // curr frame 과거 처리
@@ -162,7 +167,7 @@ public class SceneExtractionService implements Runnable {
                 }
             }
 
-            return true;
+            return dirPath;
 
         } catch (FileAlreadyExistsException fe) {   // 해당 폴더가 이미 있는 경우
             // TODO : logging
@@ -174,7 +179,7 @@ public class SceneExtractionService implements Runnable {
             // TODO : logging
             e.printStackTrace();
         }
-        return false;
+        return null;
     }
 
     /*

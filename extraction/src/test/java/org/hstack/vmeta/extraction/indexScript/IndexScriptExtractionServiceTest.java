@@ -73,7 +73,8 @@ class IndexScriptExtractionServiceTest {
         // BeforeEach에서 audioDTO 생성 완료
 
         // when
-        IndexScriptDTO indexScriptDTO = indexScriptExtractionService.extractIndexScriptDTO(audioDTO);
+        indexScriptExtractionService.init(audioDTO);
+        IndexScriptDTO indexScriptDTO = indexScriptExtractionService.extractIndexScriptDTO();
 
         // then
         assertThat(indexScriptDTO).isNotNull();
