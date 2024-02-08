@@ -146,9 +146,10 @@ public class IndexScriptExtractionService implements Runnable {
                 .map(s -> {
                     ObjectMapper mapper = new ObjectMapper();
                     try {
+                        System.out.println("REST API FLAG");
                         JsonNode jsonNode = mapper.readTree(s);
-                        Map<String, String> keywordMap = mapper.treeToValue(jsonNode, Map.class);
-                        return keywordMap;
+                        Map<String, String> indexScriptMap = mapper.treeToValue(jsonNode, Map.class);
+                        return indexScriptMap;
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                         return null;

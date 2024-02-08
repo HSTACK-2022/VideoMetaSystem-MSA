@@ -46,37 +46,54 @@ public class ExtractionService {
 
             // (Basic, Audio) >> (Scene, Keyword, IndexScript) >> (Category)
 
-            // 1. (Basic, Audio)
+            // 1. (Basic, Audio, Scene)
             // 파일 경로로 각 서비스 초기화
             basicExtractionService.init(filePath);
             audioExtractionService.init(filePath);
+            sceneExtractionService.init(filePath);
 
             // 병렬 실행을 위한 스레드 생성
-            ExecutorService preThreadPool = Executors.newFixedThreadPool(2);
+            ExecutorService preThreadPool = Executors.newFixedThreadPool(3);
             preThreadPool.execute(basicExtractionService);
             preThreadPool.execute(audioExtractionService);
+            preThreadPool.execute(sceneExtractionService);
 
             // 스레드 종료 대기 및 결과 얻기
-            preThreadPool.awaitTermination(15, TimeUnit.MINUTES);
+            preThreadPool.shutdown();
+            if (!preThreadPool.awaitTermination(15, TimeUnit.MINUTES)) {
+                preThreadPool.shutdownNow();
+                return null;
+            }
             BasicDTO basicDTO = basicExtractionService.getResult();
             AudioDTO audioDTO = audioExtractionService.getResult();
+            SceneDTO sceneDTO = sceneExtractionService.getResult();
 
 
-            // 2. (Scene, Keyword, Category, IndexScript)
+            // 2. (Keyword, IndexScript)
             // 각 서비스 초기화
-            sceneExtractionService.init(filePath);
             keywordExtractionService.init(audioDTO);
             indexScriptExtractionService.init(audioDTO);
 
             // 병렬 실행을 위한 스레드 생성
-            ExecutorService postThreadPool = Executors.newFixedThreadPool(3);
-            postThreadPool.execute(sceneExtractionService);
+            ExecutorService postThreadPool = Executors.newFixedThreadPool(2);
             postThreadPool.execute(keywordExtractionService);
             postThreadPool.execute(indexScriptExtractionService);
 
             // 스레드 종료 대기 및 결과 얻기
-            postThreadPool.awaitTermination(15, TimeUnit.MINUTES);
-            SceneDTO sceneDTO = sceneExtractionService.getResult();
+            postThreadPool.shutdown();
+            if(!postThreadPool.awaitTermination(15, TimeUnit.MINUTES)){
+                postThreadPool.shutdownNow();
+                return MetadataDTO.builder()
+                        .id(id)
+                        .length(basicDTO.getLength())
+                        .videoSize(basicDTO.getVideoSize())
+                        .videoType(basicDTO.getVideoType())
+                        .videoFrame(basicDTO.getVideoFrame())
+                        .script(audioDTO.getScript())
+                        .narrative(sceneDTO.getNarrative())
+                        .presentation(sceneDTO.getPresentation())
+                        .build();
+            }
             KeywordDTO keywordDTO = keywordExtractionService.getResult();
             IndexScriptDTO indexScriptDTO = indexScriptExtractionService.getResult();
 

@@ -154,6 +154,7 @@ def filterIndexSentence(scriptDict, resultList):
         if time is not None:
             indexScriptDict[time] = resultIndexScript
 
+    print(indexScriptDict)
     return indexScriptDict
     
 
