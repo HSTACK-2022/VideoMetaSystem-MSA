@@ -28,7 +28,6 @@ class ExtractionServiceTest {
     @Test
     @DisplayName("메타데이터 추출 전 과정")
     void extractMetadataDTO() {
-        Long start = System.currentTimeMillis();
         // given
 
         // when
@@ -36,7 +35,5 @@ class ExtractionServiceTest {
 
         // then
         assertThat(metadataDTO).isNotNull();
-        Long end = System.currentTimeMillis();
-        System.out.println((start - end) / 1000);
     }
 }
