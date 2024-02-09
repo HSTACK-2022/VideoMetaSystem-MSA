@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hstack.vmeta.extraction.audio.AudioDTO;
+import org.hstack.vmeta.extraction.scene.SceneDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,10 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class KeywordExtractionService {
+public class KeywordExtractionService implements Runnable {
+
+    private AudioDTO audioDTO;
+    private KeywordDTO keywordDTO;
 
     @Value("${fastapi.ip}")
     private String API_IP;
@@ -26,6 +30,24 @@ public class KeywordExtractionService {
 
 
     /*
+     * getter, setter
+     */
+    public void init(AudioDTO audioDTO) {
+        this.audioDTO = audioDTO;
+    }
+    public KeywordDTO getResult() {
+        return keywordDTO;
+    }
+
+    /*
+     * 스레드를 위한 run()
+     */
+    @Override
+    public void run() {
+        extractKeywordDTO();
+    }
+
+    /*
      * [extractKeywordDTO]
      *  > audioDTO를 기반으로 KeywordDTO 추출
      * @param
@@ -33,7 +55,7 @@ public class KeywordExtractionService {
      * @returnVal
      * - KeywordDTO : List<keyword>
      */
-    public KeywordDTO extractKeywordDTO(AudioDTO audioDTO) {
+    public KeywordDTO extractKeywordDTO() {
         try {
             // script -> string list로 변환
             List<String> scriptList = script2StringList(audioDTO);
@@ -44,7 +66,7 @@ public class KeywordExtractionService {
             // Map -> keyword list로 변환
             List<KeywordDTO.Keyword> keyword = keywordMap2List(keywordMap);
 
-            return KeywordDTO.builder()
+            return keywordDTO = KeywordDTO.builder()
                     .keyword(keyword)
                     .build();
 
@@ -53,7 +75,7 @@ public class KeywordExtractionService {
             e.printStackTrace();
         }
 
-        return null;
+        return keywordDTO = null;
     }
 
     /*

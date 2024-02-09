@@ -15,7 +15,7 @@ public class IndexScriptDTO {
 
     @Getter
     @Builder
-    static class IndexScript {
+    public static class IndexScript {
         Long id;
         Time time;
         String content;

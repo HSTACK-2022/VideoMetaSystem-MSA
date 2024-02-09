@@ -18,7 +18,6 @@ class AudioExtractionServiceTest {
     @Autowired
     private AudioExtractionService audioExtractionService;
 
-    /*
     @Test
     @DisplayName("Audio to Script 추출 로직 테스트")
     void extractAudioDTO() {
@@ -32,5 +31,4 @@ class AudioExtractionServiceTest {
             fail();
         }
     }
-     */
 }

@@ -51,7 +51,7 @@ public class AudioExtractionService implements Runnable {
      * @returnVal
      * - script
      */
-    private AudioDTO extractAudioDTO() {
+    AudioDTO extractAudioDTO() {
         try {
 
             // make audio dir

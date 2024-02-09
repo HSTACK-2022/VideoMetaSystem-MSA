@@ -17,13 +17,35 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class IndexScriptExtractionService {
+public class IndexScriptExtractionService implements Runnable {
+
+    private AudioDTO audioDTO;
+    private IndexScriptDTO indexScriptDTO;
 
     @Value("${fastapi.ip}")
     private String API_IP;
 
     @Value("${fastapi.port}")
     private String API_PORT;
+
+    /*
+     * getter, setter
+     */
+    public void init(AudioDTO audioDTO) {
+        this.audioDTO = audioDTO;
+    }
+    public IndexScriptDTO getResult() {
+        return indexScriptDTO;
+    }
+
+    /*
+     * 스레드를 위한 run()
+     */
+    @Override
+    public void run() {
+        extractIndexScriptDTO();
+    }
+
 
     /*
      * [extractIndexScriptDTO]
@@ -33,7 +55,7 @@ public class IndexScriptExtractionService {
      * @returnVal
      * - KeywordDTO : List<keyword>
      */
-    public IndexScriptDTO extractIndexScriptDTO(AudioDTO audioDTO) {
+    public IndexScriptDTO extractIndexScriptDTO() {
         try {
             // script -> string list로 변환
             Map<String, String> scriptMap = script2StringMap(audioDTO);
@@ -44,7 +66,7 @@ public class IndexScriptExtractionService {
             // Map -> indexScript list로 변환
             List<IndexScriptDTO.IndexScript> indexScript = indexScriptMap2List(indexScriptMap);
 
-            return IndexScriptDTO.builder()
+            return indexScriptDTO = IndexScriptDTO.builder()
                     .indexScript(indexScript)
                     .build();
 
@@ -53,17 +75,17 @@ public class IndexScriptExtractionService {
             e.printStackTrace();
         }
 
-        return null;
+        return indexScriptDTO = null;
     }
 
     /*
      * [script2StringList]
-     *  > Script를 List<String>으로 변환
+     *  > Script를 Map<String, String>으로 변환
      *
      * @param
      * - audioDTO : 추출된 audioDTO
      * @returnVal
-     * - scriptList : 변환된 List<String>
+     * - scriptMap : 변환된 Map<String, String>
      */
     Map<String, String> script2StringMap(AudioDTO audioDTO) {
         Map<String, String> scriptMap = new HashMap<>();
@@ -125,8 +147,8 @@ public class IndexScriptExtractionService {
                     ObjectMapper mapper = new ObjectMapper();
                     try {
                         JsonNode jsonNode = mapper.readTree(s);
-                        Map<String, String> keywordMap = mapper.treeToValue(jsonNode, Map.class);
-                        return keywordMap;
+                        Map<String, String> indexScriptMap = mapper.treeToValue(jsonNode, Map.class);
+                        return indexScriptMap;
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                         return null;

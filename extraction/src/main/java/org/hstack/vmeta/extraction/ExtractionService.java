@@ -6,6 +6,8 @@ import org.hstack.vmeta.extraction.basic.BasicDTO;
 import org.hstack.vmeta.extraction.basic.BasicExtractionService;
 import org.hstack.vmeta.extraction.category.CategoryDTO;
 import org.hstack.vmeta.extraction.category.CategoryExtractionService;
+import org.hstack.vmeta.extraction.indexScript.IndexScriptDTO;
+import org.hstack.vmeta.extraction.indexScript.IndexScriptExtractionService;
 import org.hstack.vmeta.extraction.keyword.KeywordDTO;
 import org.hstack.vmeta.extraction.keyword.KeywordExtractionService;
 import org.hstack.vmeta.extraction.scene.SceneDTO;
@@ -35,32 +37,68 @@ public class ExtractionService {
     @Autowired
     private CategoryExtractionService categoryExtractionService;
 
-    public MetadataDTO extractMetadataDTO(Long id, String filePath) {
+    @Autowired
+    private IndexScriptExtractionService indexScriptExtractionService;
+
+
+    public MetadataDTO extractMetadataDTO(Long id, String title, String filePath) {
         try {
 
-            // TODO : title 받아오기
-            String title = "";
+            // (Basic, Audio) >> (Scene, Keyword, IndexScript) >> (Category)
 
+            // 1. (Basic, Audio, Scene)
             // 파일 경로로 각 서비스 초기화
             basicExtractionService.init(filePath);
             audioExtractionService.init(filePath);
             sceneExtractionService.init(filePath);
 
             // 병렬 실행을 위한 스레드 생성
-            ExecutorService threadPool = Executors.newFixedThreadPool(3);
-            threadPool.execute(basicExtractionService);
-            threadPool.execute(audioExtractionService);
-            threadPool.execute(sceneExtractionService);
+            ExecutorService preThreadPool = Executors.newFixedThreadPool(3);
+            preThreadPool.execute(basicExtractionService);
+            preThreadPool.execute(audioExtractionService);
+            preThreadPool.execute(sceneExtractionService);
 
-            // 스레드 종료 대기
-            threadPool.awaitTermination(15, TimeUnit.MINUTES);
-
+            // 스레드 종료 대기 및 결과 얻기
+            preThreadPool.shutdown();
+            if (!preThreadPool.awaitTermination(15, TimeUnit.MINUTES)) {
+                preThreadPool.shutdownNow();
+                return null;
+            }
             BasicDTO basicDTO = basicExtractionService.getResult();
             AudioDTO audioDTO = audioExtractionService.getResult();
             SceneDTO sceneDTO = sceneExtractionService.getResult();
 
-            // 키워드, 카테고리, 스크립트 순차 진행
-            KeywordDTO keywordDTO = keywordExtractionService.extractKeywordDTO(audioDTO);
+
+            // 2. (Keyword, IndexScript)
+            // 각 서비스 초기화
+            keywordExtractionService.init(audioDTO);
+            indexScriptExtractionService.init(audioDTO);
+
+            // 병렬 실행을 위한 스레드 생성
+            ExecutorService postThreadPool = Executors.newFixedThreadPool(2);
+            postThreadPool.execute(keywordExtractionService);
+            postThreadPool.execute(indexScriptExtractionService);
+
+            // 스레드 종료 대기 및 결과 얻기
+            postThreadPool.shutdown();
+            if(!postThreadPool.awaitTermination(15, TimeUnit.MINUTES)){
+                postThreadPool.shutdownNow();
+                return MetadataDTO.builder()
+                        .id(id)
+                        .length(basicDTO.getLength())
+                        .videoSize(basicDTO.getVideoSize())
+                        .videoType(basicDTO.getVideoType())
+                        .videoFrame(basicDTO.getVideoFrame())
+                        .script(audioDTO.getScript())
+                        .narrative(sceneDTO.getNarrative())
+                        .presentation(sceneDTO.getPresentation())
+                        .build();
+            }
+            KeywordDTO keywordDTO = keywordExtractionService.getResult();
+            IndexScriptDTO indexScriptDTO = indexScriptExtractionService.getResult();
+
+
+            // 3. Category
             CategoryDTO categoryDTO = categoryExtractionService.extractCategoryDTO(keywordDTO, title);
 
 
@@ -74,8 +112,8 @@ public class ExtractionService {
                     .narrative(sceneDTO.getNarrative())
                     .presentation(sceneDTO.getPresentation())
                     .keyword(keywordDTO.getKeyword())
-//                    .indexScript(indexScriptDTO.getIndexScript())
-//                    .category(categoryDTO.getCategory())
+                    .category(categoryDTO.getCategory())
+                    .indexScript(indexScriptDTO.getIndexScript())
                     .build();
 
         } catch (Exception e) {
