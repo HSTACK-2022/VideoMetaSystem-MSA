@@ -43,6 +43,9 @@ dependencies {
 
 	// Web Client
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	// Kafka
+	implementation 'org.springframework.kafka:spring-kafka'
 }
 
 tasks.named('test') {
