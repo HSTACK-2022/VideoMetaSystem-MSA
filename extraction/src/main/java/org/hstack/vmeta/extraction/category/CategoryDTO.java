@@ -1,5 +1,6 @@
 package org.hstack.vmeta.extraction.category;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,8 +14,9 @@ import java.util.List;
 @AllArgsConstructor
 public class CategoryDTO {
 
-    private List<CategoryDTO.Category> category;
+    private List<Category> category;
 
+    @Getter
     @Builder
     public static class Category {
         Long id;

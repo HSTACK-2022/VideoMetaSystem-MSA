@@ -14,13 +14,13 @@ public class ExtractionCompletedProducer {
 
     public void produce(Object data) {
         try {
-            if (data.getClass() == MetadataDTO.class) {
+            if (data.getClass() != MetadataDTO.class) {
+                kafkaTemplate.send("ExtractionCompleted", data);
+            } else {
                 MetadataDTO metadataDTO = (MetadataDTO) data;
                 ObjectMapper objectMapper = new ObjectMapper();
                 String jsonStr = objectMapper.writeValueAsString(metadataDTO);
                 kafkaTemplate.send("ExtractionCompleted", jsonStr);
-            } else {
-                kafkaTemplate.send("ExtractionCompleted", data);
             }
         } catch (Exception e) {
             e.printStackTrace();

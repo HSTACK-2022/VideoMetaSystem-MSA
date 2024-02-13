@@ -30,7 +30,7 @@ public class ExtractionConsumer {
             String title = dataMap.get("title");
             String filePath = dataMap.get("filePath");
             MetadataDTO metadataDTO = extractionService.extractMetadataDTO(id, title, filePath);
-            extractionCompletedProducer.produce(MetadataDTO.builder().build());
+            extractionCompletedProducer.produce(metadataDTO);
 
         } catch (Exception e) {
             e.printStackTrace();

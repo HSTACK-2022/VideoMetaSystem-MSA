@@ -100,21 +100,35 @@ public class ExtractionService {
 
             // 3. Category
             CategoryDTO categoryDTO = categoryExtractionService.extractCategoryDTO(keywordDTO, title);
+            if(categoryDTO == null){
+                return MetadataDTO.builder()
+                        .id(id)
+                        .length(basicDTO.getLength())
+                        .videoSize(basicDTO.getVideoSize())
+                        .videoType(basicDTO.getVideoType())
+                        .videoFrame(basicDTO.getVideoFrame())
+                        .script(audioDTO.getScript())
+                        .narrative(sceneDTO.getNarrative())
+                        .presentation(sceneDTO.getPresentation())
+                        .keyword(keywordDTO.getKeyword())
+                        .indexScript(indexScriptDTO.getIndexScript())
+                        .build();
+            } else {
+                return MetadataDTO.builder()
+                        .id(id)
+                        .length(basicDTO.getLength())
+                        .videoSize(basicDTO.getVideoSize())
+                        .videoType(basicDTO.getVideoType())
+                        .videoFrame(basicDTO.getVideoFrame())
+                        .script(audioDTO.getScript())
+                        .narrative(sceneDTO.getNarrative())
+                        .presentation(sceneDTO.getPresentation())
+                        .keyword(keywordDTO.getKeyword())
+                        .category(categoryDTO.getCategory())
+                        .indexScript(indexScriptDTO.getIndexScript())
+                        .build();
 
-
-            return MetadataDTO.builder()
-                    .id(id)
-                    .length(basicDTO.getLength())
-                    .videoSize(basicDTO.getVideoSize())
-                    .videoType(basicDTO.getVideoType())
-                    .videoFrame(basicDTO.getVideoFrame())
-                    .script(audioDTO.getScript())
-                    .narrative(sceneDTO.getNarrative())
-                    .presentation(sceneDTO.getPresentation())
-                    .keyword(keywordDTO.getKeyword())
-                    .category(categoryDTO.getCategory())
-                    .indexScript(indexScriptDTO.getIndexScript())
-                    .build();
+            }
 
         } catch (Exception e) {
             // TODO : Logging
